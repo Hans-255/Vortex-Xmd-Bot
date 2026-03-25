@@ -1,14 +1,14 @@
-![ULTRAXAS XMD Logo](https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg)
+![VORTEX XMD Logo](https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg)
 
-**ULTRAXAS XMD** is a powerful WhatsApp bot designed for easy deployment and session management.  
+**VORTEX XMD** is a powerful WhatsApp bot designed for easy deployment and session management.  
 Get started with one-click Heroku deployment, session generation, and live GitHub analytics—all wrapped in an interactive, animated web experience.
 
 ---
 
 ## 🚀 Quick Deploy
 
-Deploy ULTRAXAS XMD to Heroku in one click!  
-[![Deploy to Heroku](https://img.shields.io/badge/Deploy%20to-Heroku-purple?logo=heroku&style=for-the-badge)](https://ultraxas-xmd-verification.onrender.com)
+Deploy VORTEX XMD to Heroku in one click!  
+[![Deploy to Heroku](https://img.shields.io/badge/Deploy%20to-Heroku-purple?logo=heroku&style=for-the-badge)](https://VORTEX XMD-verification.onrender.com)
 
 ---
 
@@ -35,14 +35,14 @@ Easily generate a session for your bot with a single click:
 ## 📊 GitHub Analytics
 
 Stay up to date with live stats from the official repo:  
-[![GitHub Repo](https://img.shields.io/badge/View%20on-GitHub-black?logo=github&style=for-the-badge)](https://github.com/xason0/ULTRAXAS-XMD)
+[![GitHub Repo](https://img.shields.io/badge/View%20on-GitHub-black?logo=github&style=for-the-badge)](https://github.com/mrhanstz/VORTEX XMD)
 
 ---
 
 ## 💬 WhatsApp Channel
 
 Join our official WhatsApp channel for updates, support, and community:  
-[![Join WhatsApp Channel](https://img.shields.io/badge/WhatsApp-Channel-25D366?logo=whatsapp&style=for-the-badge)](https://whatsapp.com/channel/0029Vb6Ob7iKQuJSeAx8s92j)
+[![Join WhatsApp Channel](https://img.shields.io/badge/WhatsApp-Channel-25D366?logo=whatsapp&style=for-the-badge)](https://whatsapp.com/channel/0029Vb7JRfvCRs1gTmsCB812)
 
 ---
 
@@ -69,4 +69,4 @@ Join our official WhatsApp channel for updates, support, and community:
    Clone the repo and set up your session.
 
    ```bash
-   git clone https://github.com/xason0/ULTRAXAS-XMD.git
+   git clone https://github.com/mrhanstz/VORTEX XMD.git
