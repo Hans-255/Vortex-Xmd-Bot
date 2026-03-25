@@ -1,9 +1,12 @@
-
-
 {
-  "name": "ULTRAXAS XMD",
+  "name": "VORTEX XMD",
   "description": "Best WhatsApp bot developed by ultra",
-  "keywords": ["bot", "node", "baileys", "whatsapp"],
+  "keywords": [
+    "bot",
+    "node",
+    "baileys",
+    "whatsapp"
+  ],
   "logo": "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg",
   "repository": "https://github.com/bwmxmd254/BWM-XMD",
   "success_url": "/",
@@ -51,7 +54,7 @@
     },
     "BOT_NAME": {
       "description": "Name for your bot",
-      "value": "ULTRAXAS XMD",
+      "value": "VORTEX XMD",
       "required": false
     },
     "BOT_URL": {
@@ -67,43 +70,43 @@
     "HEROKU_API_KEY": {
       "description": "Enter your Heroku API key to be able to control your vars",
       "value": "",
-      "required": false 
+      "required": false
     },
     "HEROKU_APP_NAME": {
       "description": "Enter your Heroku app name to be able to control vars",
       "value": "",
-      "required": false 
+      "required": false
     },
     "OWNER_NUMBER": {
       "description": "Enter your number eg, 2547xxxxxxx",
-      "value": "",
-      "required": false 
+      "value": "255753668403",
+      "required": false
     },
     "STATUS_REACT_EMOJIS": {
       "description": "Enter your auto like status emojis",
       "value": "💚,🚀,🌎,✅",
-      "required": false 
+      "required": false
     },
     "AUTO_REACT": {
       "description": "Enter your auto react messages",
       "value": "no",
-      "required": false 
+      "required": false
     },
     "AUTO_REACT_STATUS": {
       "description": "Enter yes for your bot to auto like status",
       "value": "yes",
-      "required": false 
+      "required": false
     },
     "OWNER_NAME": {
       "description": "Owner name",
-      "value": "ultra",
+      "value": "HansTz",
       "required": false
     },
     "SESSION_ID": {
-      "description": "Your session ID",
+      "description": "Your SESSION_ID from Mega (starts with HansTz&)",
       "value": "",
       "required": true
-    },    
+    },
     "STARTING_BOT_MESSAGE": {
       "description": "Enable starting message (yes/no)",
       "value": "yes",
@@ -123,7 +126,7 @@
       "description": "Enable anti-delete deleted to recover in conversation (yes/no)",
       "value": "no",
       "required": false
-    },	  
+    },
     "GROUPANTILINK": {
       "description": "Enable anti-link in groups (yes/no)",
       "value": "no",
@@ -147,56 +150,6 @@
     "AUDIO_CHATBOT": {
       "description": "Enable audio chatbot (yes/no)",
       "value": "no",
-      "required": false
-    },
-    "MENU_TOP_LEFT": {
-      "description": "Menu top left design",
-      "value": "┌─❖",
-      "required": false
-    },
-    "MENU_BOT_NAME_LINE": {
-      "description": "Bot name line",
-      "value": "│ ",
-      "required": false
-    },
-    "MENU_BOTTOM_LEFT": {
-      "description": "Menu bottom left",
-      "value": "└┬❖",
-      "required": false
-    },
-    "MENU_GREETING_LINE": {
-      "description": "Greeting line",
-      "value": "┌┤ ",
-      "required": false
-    },
-    "MENU_DIVIDER": {
-      "description": "Menu divider",
-      "value": "│└────────┈⳹",
-      "required": false
-    },
-    "MENU_USER_LINE": {
-      "description": "User line in menu",
-      "value": "│🕵️ ",
-      "required": false
-    },
-    "MENU_DATE_LINE": {
-      "description": "Date line in menu",
-      "value": "│📅 ",
-      "required": false
-    },
-    "MENU_TIME_LINE": {
-      "description": "Time line in menu",
-      "value": "│⏰ ",
-      "required": false
-    },
-    "MENU_STATS_LINE": {
-      "description": "Stats line in menu",
-      "value": "│⭐ ",
-      "required": false
-    },
-    "MENU_BOTTOM_DIVIDER": {
-      "description": "Bottom divider of menu",
-      "value": "└─────────────┈⳹",
       "required": false
     }
   },
