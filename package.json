@@ -9,12 +9,15 @@
     "npm": "10.8.2"
   },
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "pm2 start index.js --deep-monitoring --attach --name vortex-xmd",
+    "dev": "node index.js",
     "test": "node index.js",
     "c": "tsc",
     "pm2-start": "pm2 start index.js --attach",
-    "xmd": "pm2 start index.js --attach"
+    "xmd": "pm2 start index.js --attach",
+    "stop": "pm2 stop vortex-xmd",
+    "restart": "pm2 restart vortex-xmd",
+    "heroku-postbuild": "npm install -g pm2 && pm2 list || true"
   },
   "keywords": [
     "bot",
@@ -22,15 +25,15 @@
     "bmwxmd",
     "quantum",
     "whatsapp-bot",
-    "ultraxas"
+    "VORTEX"
   ],
-  "author": "ultraxas",
+  "author": "VORTEX",
   "license": "ISC",
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
     "@hapi/boom": "^10.0.1",
     "@types/node": "^18.0.6",
-    "@whiskeysockets/baileys": "npm:baileys@6.7.18",
+    "@whiskeysockets/baileys": "github:HansTz/HansTech",
     "acrcloud": "^1.4.0",
     "adm-zip": "^0.5.16",
     "api-dylux": "^1.8.5",
