@@ -1,7 +1,7 @@
 global.conf = require('./config');
 const makeWASocket = require("@whiskeysockets/baileys").default
 const logger = require("@whiskeysockets/baileys/lib/Utils/logger").default.child({});
-const { createContext } = require("./Ibrahim/helper");
+const { createContext } = require('./Hans/helper");
 const pino = require("pino");
 const { Boom } = require("@hapi/boom");
 const conf = require("./config");
@@ -14,7 +14,65 @@ const path = require("path");
 const https = require('https');
 const FileType = require("file-type");
 const { Sticker, createSticker, StickerTypes } = require("wa-sticker-formatter");
-const evt = require("./Ibrahim/adams");
+const evt = require('./Hans/adams");
+
+// ═══════ GITHUB MEDIA ═══════
+const GITHUB_IMAGES_API = 'https://api.github.com/repos/Mrhanstz/HansTz-Sever/contents/Database';
+let cachedImageUrls = [];
+let usedImageIndices = [];
+async function fetchGitHubImages() {
+    try {
+        const response = await fetch(GITHUB_IMAGES_API);
+        const files = await response.json();
+        if (Array.isArray(files)) {
+            cachedImageUrls = files.filter(f => f.download_url && /\.(jpg|jpeg|png|webp|gif)$/i.test(f.name)).map(f => f.download_url);
+            usedImageIndices = [];
+            console.log('Loaded ' + cachedImageUrls.length + ' images from GitHub');
+        }
+    } catch (err) { console.error('Failed to fetch GitHub images:', err.message); }
+}
+function getRandomImage() {
+    if (cachedImageUrls.length === 0) return 'https://raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/HansTz.jpg';
+    if (usedImageIndices.length >= cachedImageUrls.length) usedImageIndices = [];
+    const available = cachedImageUrls.map((_, i) => i).filter(i => !usedImageIndices.includes(i));
+    const randomIdx = available[Math.floor(Math.random() * available.length)];
+    usedImageIndices.push(randomIdx);
+    return cachedImageUrls[randomIdx];
+}
+fetchGitHubImages();
+setInterval(fetchGitHubImages, 30 * 60 * 1000);
+
+const GITHUB_AUDIOS_API = 'https://api.github.com/repos/Mrhanstz/HansTz-Sever/contents/databaseaudios';
+let audioFiles = [];
+let usedAudioIndices = [];
+async function fetchAudioFiles() {
+    try {
+        const response = await fetch(GITHUB_AUDIOS_API);
+        const files = await response.json();
+        if (Array.isArray(files)) {
+            const validAudios = files.filter(f => f.download_url && f.size > 100 && /\.(mp3|mp4|m4a|ogg|wav|aac|m4r)$/i.test(f.name)).map(f => f.download_url);
+            if (validAudios.length > 0) { audioFiles = validAudios; usedAudioIndices = []; console.log('Loaded ' + audioFiles.length + ' audio files from GitHub'); }
+        }
+    } catch (err) { console.error('Failed to fetch audio files:', err.message); }
+}
+function getRandomAudio() {
+    if (audioFiles.length === 0) return null;
+    if (usedAudioIndices.length >= audioFiles.length) usedAudioIndices = [];
+    const available = audioFiles.map((_, i) => i).filter(i => !usedAudioIndices.includes(i));
+    const randomIdx = available[Math.floor(Math.random() * available.length)];
+    usedAudioIndices.push(randomIdx);
+    return audioFiles[randomIdx];
+}
+fetchAudioFiles();
+setInterval(fetchAudioFiles, 30 * 60 * 1000);
+
+const ownerNumber = ['255753668403'];
+const tempDir = path.join(require('os').tmpdir(), 'cache-temp');
+if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+const clearTempDir = () => { fs.readdir(tempDir, (err, files) => { if (err) return; for (const file of files) fs.unlink(path.join(tempDir, file), ()=>{}); }); };
+setInterval(clearTempDir, 5 * 60 * 1000);
+// ═══════ END GITHUB MEDIA ═══════
+
 const rateLimit = new Map();
 const MAX_RATE_LIMIT_ENTRIES = 100000;
 const RATE_LIMIT_WINDOW = 3000;
@@ -34,12 +92,12 @@ const herokuAppLink = process.env.HEROKU_APP_LINK || `https://dashboard.heroku.c
 const botOwner = process.env.NUMERO_OWNER || "Unknown Owner";
 const PORT = process.env.PORT || 3000;
 const app = express();
-let adams;
+let vortex;
 
 require("dotenv").config({ path: "./config.env" });
 logger.level = "silent";
 
-app.use(express.static("adams"));
+app.use(express.static('HansTz'));
 app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"));
 
 // ENHANCED WORKER PROCESS MANAGER FOR AUTO-RESTART
@@ -104,9 +162,9 @@ class WorkerManager {
 
         try {
             // Clean up current connections
-            if (adams) {
+            if (vortex) {
                 try {
-                    await adams.end();
+                    await vortex.end();
                 } catch (e) {
                     console.log('Connection cleanup warning:', e.message);
                 }
@@ -125,7 +183,7 @@ class WorkerManager {
             // Clean session if required
             if (cleanSession || this.authErrorCount >= this.maxAuthErrors) {
                 try {
-                    const sessionDir = path.join(__dirname, "Ibrahim");
+                    const sessionDir = path.join(__dirname, 'sessions');
                     if (fs.existsSync(sessionDir)) {
                         await fs.remove(sessionDir);
                         console.log('✅ Session directory cleaned');
@@ -205,14 +263,14 @@ class WorkerManager {
         // Graceful shutdown handlers
         process.on('SIGTERM', () => {
             console.log('📡 SIGTERM received, shutting down gracefully...');
-            if (adams) adams.end();
+            if (vortex) vortex.end();
             if (store) store.destroy();
             process.exit(0);
         });
 
         process.on('SIGINT', () => {
             console.log('📡 SIGINT received, shutting down gracefully...');
-            if (adams) adams.end();
+            if (vortex) vortex.end();
             if (store) store.destroy();
             process.exit(0);
         });
@@ -226,7 +284,7 @@ workerManager.setupErrorHandlers();
 // Health check and monitoring endpoints
 app.get('/health', (req, res) => {
     res.json({
-        status: adams ? 'connected' : 'disconnected',
+        status: vortex ? 'connected' : 'disconnected',
         uptime: process.uptime(),
         authErrors: workerManager.authErrorCount,
         restartAttempts: workerManager.currentRestartAttempt,
@@ -527,57 +585,32 @@ function atbverifierEtatJid(jid) {
 // ENHANCED AUTHENTICATION FUNCTION WITH BETTER ERROR HANDLING
 async function authentification() {
     try {
-        const sessionDir = path.join(__dirname, "Ibrahim");
-        
-        if (!fs.existsSync(sessionDir)) {
-            fs.mkdirSync(sessionDir, { recursive: true });
-        }
-        
-        const credsPath = path.join(sessionDir, "creds.json");
-        
-        if (!fs.existsSync(credsPath) || conf.session !== "zokk") {
-            console.log("Setting up session...");
-            
-            if (!conf.session || conf.session === "zokk") {
-                throw new Error("No valid session provided");
-            }
-            
-            const [header, b64data] = conf.session.split(';;;');
-            
-            if (header !== "ULTRAXAS-MD" || !b64data) {
-                throw new Error("Invalid session format");
-            }
-            
-            try {
-                const cleanB64 = b64data.replace(/\.\.\./g, '');
-                const compressedData = Buffer.from(cleanB64, 'base64');
-                const decompressedData = zlib.gunzipSync(compressedData);
-                
-                const parsedData = JSON.parse(decompressedData.toString());
-                
-                if (!parsedData.noiseKey || !parsedData.signedIdentityKey) {
-                    throw new Error("Invalid session structure");
-                }
-                
-                fs.writeFileSync(credsPath, decompressedData, "utf8");
-                console.log("✅ Session file created successfully");
-            } catch (parseError) {
-                throw new Error(`Invalid session data: ${parseError.message}`);
-            }
+        const sessionDir = path.join(__dirname, 'sessions');
+        if (!fs.existsSync(sessionDir)) fs.mkdirSync(sessionDir, { recursive: true });
+        const credsPath = path.join(sessionDir, 'creds.json');
+        if (!fs.existsSync(credsPath)) {
+            console.log('📥 Downloading session from Mega...');
+            if (!conf.session) throw new Error('No SESSION_ID set. Please set SESSION_ID starting with HansTz&');
+            const megaId = conf.session.replace('HansTz&', '');
+            const filer = File.fromURL('https://mega.nz/file/' + megaId);
+            await new Promise((resolve, reject) => {
+                filer.download((err, data) => {
+                    if (err) return reject(new Error('Mega download failed: ' + err.message));
+                    fs.writeFileSync(credsPath, data);
+                    console.log('✅ Session downloaded!');
+                    resolve();
+                });
+            });
         }
     } catch (error) {
-        console.error("❌ Session setup failed:", error.message);
-        
-        const sessionDir = path.join(__dirname, "Ibrahim");
-        if (fs.existsSync(sessionDir)) {
-            fs.rmSync(sessionDir, { recursive: true, force: true });
-        }
-        
+        console.error('❌ Session setup failed:', error.message);
+        const sessionDir = path.join(__dirname, 'sessions');
+        if (fs.existsSync(sessionDir)) fs.rmSync(sessionDir, { recursive: true, force: true });
         throw error;
     }
 }
 
-module.exports = { authentification };
+;
 
 let zk;
 let store;
@@ -591,7 +624,7 @@ async function main() {
         await authentification();
         
         const { version, isLatest } = await fetchLatestBaileysVersion();
-        const { state, saveCreds } = await useMultiFileAuthState(__dirname + "/Ibrahim");
+        const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions');
         
         if (store) {
             store.destroy();
@@ -647,17 +680,17 @@ async function main() {
             }
         };
 
-        adams = makeWASocket(sockOptions);
+        vortex = makeWASocket(sockOptions);
         
         try {
-            store.bind(adams.ev);
+            store.bind(vortex.ev);
             console.log('✅ Custom store bound successfully');
         } catch (storeError) {
             console.error('Store binding error:', storeError);
             if (await workerManager.handleAuthError(storeError)) return;
         }
 
-        adams.ev.process(async (events) => {
+        vortex.ev.process(async (events) => {
             if (events['creds.update']) {
                 try {
                     await saveCreds();
@@ -680,8 +713,8 @@ async function main() {
 
 //============================================================================//
 let ibraah = { chats: {} };
-const botJid = `${adams.user?.id.split(':')[0]}@s.whatsapp.net`;
-const botOwnerJid = `${adams.user?.id.split(':')[0]}@s.whatsapp.net`; // Fixed: Changed from adams.user to config
+const botJid = `${vortex.user?.id.split(':')[0]}@s.whatsapp.net`;
+const botOwnerJid = `${vortex.user?.id.split(':')[0]}@s.whatsapp.net`; // Fixed: Changed from vortex.user to config
 
 // Improved media processing function with better error handling
 const processMediaMessage = async (deletedMessage) => {
@@ -760,7 +793,7 @@ const handleDeletedMessage = async (deletedMsg, key, deleter) => {
                         const text = deletedMsg.message.conversation || 
                                     deletedMsg.message.extendedTextMessage.text;
                         
-                        await adams.sendMessage(key.remoteJid, {
+                        await vortex.sendMessage(key.remoteJid, {
                             text: `${baseAlert}\n\n📝 *Content:* ${text}`,
                             mentions: [deleter],
                             ...context
@@ -769,7 +802,7 @@ const handleDeletedMessage = async (deletedMsg, key, deleter) => {
                         // Handle media in chat
                         const media = await processMediaMessage(deletedMsg);
                         if (media) {
-                            await adams.sendMessage(key.remoteJid, {
+                            await vortex.sendMessage(key.remoteJid, {
                                 [media.type]: { url: media.path },
                                 caption: media.caption ? 
                                     `${baseAlert}\n\n📌 *Media Caption:* ${media.caption}` : 
@@ -814,14 +847,14 @@ const handleDeletedMessage = async (deletedMsg, key, deleter) => {
                         const text = deletedMsg.message.conversation || 
                                     deletedMsg.message.extendedTextMessage.text;
                         
-                        await adams.sendMessage(botOwnerJid, { 
+                        await vortex.sendMessage(botOwnerJid, { 
                             text: `📩 *Forwarded Deleted Message*\n\n${text}\n\n${ownerContext.text}`,
                             ...context
                         });
                     } else {
                         const media = await processMediaMessage(deletedMsg);
                         if (media) {
-                            await adams.sendMessage(botOwnerJid, {
+                            await vortex.sendMessage(botOwnerJid, {
                                 [media.type]: { url: media.path },
                                 caption: media.caption ? 
                                     `📩 *Forwarded Deleted Media*\n\n${media.caption}\n\n${ownerContext.text}` : 
@@ -849,7 +882,7 @@ const handleDeletedMessage = async (deletedMsg, key, deleter) => {
                     }
                 } catch (error) {
                     logger.error('Failed to process ANTIDELETE2:', error);
-                    await adams.sendMessage(botOwnerJid, {
+                    await vortex.sendMessage(botOwnerJid, {
                         text: `⚠️ Failed to forward deleted message from ${deleter}\n\nError: ${error.message}`,
                         ...context
                     });
@@ -863,7 +896,7 @@ const handleDeletedMessage = async (deletedMsg, key, deleter) => {
     }
 };
 
-adams.ev.on("messages.upsert", async ({ messages }) => {
+vortex.ev.on("messages.upsert", async ({ messages }) => {
     try {
         const ms = messages[0];
         if (!ms?.message) return;
@@ -946,9 +979,9 @@ if (conf.AUTO_BIO === "yes") {
             const timeQuotes = quotes[block];
             const quote = timeQuotes[Math.floor(Math.random() * timeQuotes.length)];
 
-            const bioText = `Ultraxas md\n➤ ${quote}\n📅 ${timeDate}`;
+            const bioText = `VORTEX md\n➤ ${quote}\n📅 ${timeDate}`;
 
-            await adams.updateProfileStatus(bioText);
+            await vortex.updateProfileStatus(bioText);
             //console.log('Bio updated at:', new Date().toLocaleString());
         } catch (error) {
             //console.error('Bio update failed:', error.message);
@@ -964,9 +997,9 @@ if (conf.AUTO_BIO === "yes") {
 
 // Silent Anti-Call System (unchanged)
 if (conf.ANTICALL === 'yes') {
-    adams.ev.on("call", async (callData) => {
+    vortex.ev.on("call", async (callData) => {
         try {
-            await adams.rejectCall(callData[0].id, callData[0].from);
+            await vortex.rejectCall(callData[0].id, callData[0].from);
             console.log('Call blocked from:', callData[0].from.slice(0, 6) + '...');
         } catch (error) {
             console.error('Call block failed:', error.message);
@@ -987,9 +1020,9 @@ const updatePresence = async (jid) => {
         // Skip status broadcasts for targeted presence
         if (isStatus) {
             if (etat == 1) {
-                await adams.sendPresenceUpdate("available", jid);
+                await vortex.sendPresenceUpdate("available", jid);
             } else {
-                await adams.sendPresenceUpdate("unavailable", jid);
+                await vortex.sendPresenceUpdate("unavailable", jid);
             }
             return;
         }
@@ -997,52 +1030,52 @@ const updatePresence = async (jid) => {
         // Set presence based on ETAT value with chat type filtering
         if (etat == 1) {
             // Available - works everywhere
-            await adams.sendPresenceUpdate("available", jid);
+            await vortex.sendPresenceUpdate("available", jid);
         } else if (etat == 2) {
             // Typing in private chats only
             if (isPrivate) {
-                await adams.sendPresenceUpdate("composing", jid);
+                await vortex.sendPresenceUpdate("composing", jid);
             } else {
-                await adams.sendPresenceUpdate("unavailable", jid);
+                await vortex.sendPresenceUpdate("unavailable", jid);
             }
         } else if (etat == 3) {
             // Recording in private chats only
             if (isPrivate) {
-                await adams.sendPresenceUpdate("recording", jid);
+                await vortex.sendPresenceUpdate("recording", jid);
             } else {
-                await adams.sendPresenceUpdate("unavailable", jid);
+                await vortex.sendPresenceUpdate("unavailable", jid);
             }
         } else if (etat == 4) {
             // Typing in groups only
             if (isGroup) {
-                await adams.sendPresenceUpdate("composing", jid);
+                await vortex.sendPresenceUpdate("composing", jid);
             } else {
-                await adams.sendPresenceUpdate("unavailable", jid);
+                await vortex.sendPresenceUpdate("unavailable", jid);
             }
         } else if (etat == 5) {
             // Typing in all chats (private + groups)
             if (isPrivate || isGroup) {
-                await adams.sendPresenceUpdate("composing", jid);
+                await vortex.sendPresenceUpdate("composing", jid);
             } else {
-                await adams.sendPresenceUpdate("unavailable", jid);
+                await vortex.sendPresenceUpdate("unavailable", jid);
             }
         } else if (etat == 6) {
             // Recording in groups only
             if (isGroup) {
-                await adams.sendPresenceUpdate("recording", jid);
+                await vortex.sendPresenceUpdate("recording", jid);
             } else {
-                await adams.sendPresenceUpdate("unavailable", jid);
+                await vortex.sendPresenceUpdate("unavailable", jid);
             }
         } else if (etat == 7) {
             // Recording in all chats (private + groups)
             if (isPrivate || isGroup) {
-                await adams.sendPresenceUpdate("recording", jid);
+                await vortex.sendPresenceUpdate("recording", jid);
             } else {
-                await adams.sendPresenceUpdate("unavailable", jid);
+                await vortex.sendPresenceUpdate("unavailable", jid);
             }
         } else {
             // Default: unavailable (etat = 0 or any other value)
-            await adams.sendPresenceUpdate("unavailable", jid);
+            await vortex.sendPresenceUpdate("unavailable", jid);
         }
         
         logger.debug(`Presence updated based on ETAT: ${etat} for ${isGroup ? 'group' : isPrivate ? 'private' : 'other'} chat`);
@@ -1052,7 +1085,7 @@ const updatePresence = async (jid) => {
 };
 
 // Update presence on connection
-adams.ev.on("connection.update", ({ connection }) => {
+vortex.ev.on("connection.update", ({ connection }) => {
     if (connection === "open") {
         logger.info("Connection established - updating presence");
         updatePresence("status@broadcast");
@@ -1060,7 +1093,7 @@ adams.ev.on("connection.update", ({ connection }) => {
 });
 
 // Update presence when receiving a message
-adams.ev.on("messages.upsert", async ({ messages }) => {
+vortex.ev.on("messages.upsert", async ({ messages }) => {
     if (messages && messages.length > 0) {
         const message = messages[0];
         if (message.key && message.key.remoteJid) {
@@ -1073,7 +1106,7 @@ adams.ev.on("messages.upsert", async ({ messages }) => {
 if (conf.AUTO_READ === "yes") {
     logger.info("[Read] Auto-read enabled for chats");
     
-    adams.ev.on("messages.upsert", async (m) => {
+    vortex.ev.on("messages.upsert", async (m) => {
         try {
             const unread = m.messages.filter(
                 msg => !msg.key.fromMe && 
@@ -1081,7 +1114,7 @@ if (conf.AUTO_READ === "yes") {
                        msg.message // Ensure message exists
             );
             if (unread.length > 0) {
-                await adams.readMessages(unread.map(msg => msg.key));
+                await vortex.readMessages(unread.map(msg => msg.key));
                 logger.info(`[Read] Marked ${unread.length} messages as read`);
             }
         } catch (err) {
@@ -1096,11 +1129,11 @@ if (conf.AUTO_REPLY_STATUS === "yes") {
     
     const lastNotified = new Map();
     
-    adams.ev.on("messages.upsert", async (m) => {
+    vortex.ev.on("messages.upsert", async (m) => {
         try {
             const statusUpdates = m.messages.filter(
                 msg => msg.key?.remoteJid === "status@broadcast" && 
-                      !msg.key.participant?.includes(adams.user.id.split(':')[0]) &&
+                      !msg.key.participant?.includes(vortex.user.id.split(':')[0]) &&
                       msg.message
             );
             
@@ -1108,7 +1141,7 @@ if (conf.AUTO_REPLY_STATUS === "yes") {
                 const statusMessage = statusUpdates[0];
                 const statusSender = statusMessage.key.participant;
                 
-                if (!statusSender || statusSender.includes(adams.user.id.split(':')[0])) return;
+                if (!statusSender || statusSender.includes(vortex.user.id.split(':')[0])) return;
                 
                 const now = Date.now();
                 const lastNotification = lastNotified.get(statusSender) || 0;
@@ -1116,7 +1149,7 @@ if (conf.AUTO_REPLY_STATUS === "yes") {
                 if (now - lastNotification > 300000) { // 5 minutes cooldown
                     lastNotified.set(statusSender, now);
                     
-                    await adams.sendMessage(statusSender, {
+                    await vortex.sendMessage(statusSender, {
                         text: `${conf.REPLY_STATUS_TEXT || "*ʏᴏᴜʀ sᴛᴀᴛᴜs ʜᴀᴠᴇ ʙᴇᴇɴ ᴠɪᴇᴡᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ✅*"}\n\n📌 For more info visit: *bwmxmd.online*\n\n> ǫᴜᴀɴᴛᴜᴍ ᴠɪᴇᴡᴇʀ`,
                         contextInfo: {
                             quotedMessage: statusMessage.message,
@@ -1127,8 +1160,8 @@ if (conf.AUTO_REPLY_STATUS === "yes") {
                             forwardingScore: 999,
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
-                                newsletterJid: "120363418485111392@newsletter",
-                                newsletterName: "ULTRAXAS XMD",
+                                newsletterJid: '120363421513037430@newsletter',
+                                newsletterName: "VORTEX XMD",
                                 serverMessageId: Math.floor(100000 + Math.random() * 900000),
                             }
                         }
@@ -1162,7 +1195,7 @@ async function getProfilePhoto(jid, fallbackImage = welcomeImage) {
             return profileCache.get(jid);
         }
         
-        const profileUrl = await adams.profilePictureUrl(jid, 'image');
+        const profileUrl = await vortex.profilePictureUrl(jid, 'image');
         profileCache.set(jid, profileUrl);
         return profileUrl;
     } catch (error) {
@@ -1175,7 +1208,7 @@ async function getProfilePhoto(jid, fallbackImage = welcomeImage) {
 async function getContactName(jid, groupId) {
     try {
         // Get group metadata to find the participant
-        const metadata = await adams.groupMetadata(groupId);
+        const metadata = await vortex.groupMetadata(groupId);
         const participant = metadata.participants.find(p => p.id === jid);
         
         if (participant && participant.notify) {
@@ -1192,7 +1225,7 @@ async function getContactName(jid, groupId) {
     }
 }
 
-adams.ev.on('group-participants.update', async (update) => {
+vortex.ev.on('group-participants.update', async (update) => {
     try {
         const { id, participants, action } = update;
         
@@ -1208,7 +1241,7 @@ adams.ev.on('group-participants.update', async (update) => {
         let groupMetadata;
         if (!groupName) {
             try {
-                groupMetadata = await adams.groupMetadata(id);
+                groupMetadata = await vortex.groupMetadata(id);
                 groupName = groupMetadata.subject || "this group";
                 groupCache.set(id, groupName);
                 logger.info(`Group name: ${groupName}`);
@@ -1249,7 +1282,7 @@ adams.ev.on('group-participants.update', async (update) => {
                     
                     const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
                     
-                    await adams.sendMessage(id, {
+                    await vortex.sendMessage(id, {
                         image: { url: profilePhoto },
                         caption: randomMessage,
                         mentions: [participant],
@@ -1257,8 +1290,8 @@ adams.ev.on('group-participants.update', async (update) => {
                             forwardingScore: 999,
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
-                                newsletterJid: "120363418485111392@newsletter",
-                                newsletterName: "ULTRAXAS XMD",
+                                newsletterJid: '120363421513037430@newsletter',
+                                newsletterName: "VORTEX XMD",
                                 serverMessageId: Math.floor(100000 + Math.random() * 900000),
                             },
                         }
@@ -1284,7 +1317,7 @@ adams.ev.on('group-participants.update', async (update) => {
                     
                     const randomMessage = farewellMessages[Math.floor(Math.random() * farewellMessages.length)];
                     
-                    await adams.sendMessage(id, {
+                    await vortex.sendMessage(id, {
                         image: { url: profilePhoto },
                         caption: randomMessage,
                         mentions: [participant],
@@ -1292,8 +1325,8 @@ adams.ev.on('group-participants.update', async (update) => {
                             forwardingScore: 999,
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
-                                newsletterJid: "120363418485111392@newsletter",
-                                newsletterName: "ULTRAXAS XMD",
+                                newsletterJid: '120363421513037430@newsletter',
+                                newsletterName: "VORTEX XMD",
                                 serverMessageId: Math.floor(100000 + Math.random() * 900000),
                             },
                         }
@@ -1318,14 +1351,14 @@ adams.ev.on('group-participants.update', async (update) => {
 if (conf.AUTO_READ_STATUS === "yes") {
     logger.info("[Status] Auto-read enabled for status updates");
     
-    adams.ev.on("messages.upsert", async (m) => {
+    vortex.ev.on("messages.upsert", async (m) => {
         try {
             const statusUpdates = m.messages.filter(
                 msg => msg.key?.remoteJid === "status@broadcast" && 
-                      !msg.key.participant?.includes(adams.user.id.split(':')[0])
+                      !msg.key.participant?.includes(vortex.user.id.split(':')[0])
             );
             if (statusUpdates.length > 0) {
-                await adams.readMessages(statusUpdates.map(msg => msg.key));
+                await vortex.readMessages(statusUpdates.map(msg => msg.key));
             }
         } catch (err) {
             logger.error("[Status] Read error:", err);
@@ -1362,7 +1395,7 @@ if (conf.AUTO_REACT === "yes") {
 
     let lastReactTime = 0;
 
-    adams.ev.on("messages.upsert", async (m) => {
+    vortex.ev.on("messages.upsert", async (m) => {
         try {
             const { messages } = m;
             const now = Date.now();
@@ -1387,7 +1420,7 @@ if (conf.AUTO_REACT === "yes") {
 
                 emoji = emoji || fallbackEmojis[Math.floor(Math.random() * fallbackEmojis.length)];
 
-                await adams.sendMessage(message.key.remoteJid, {
+                await vortex.sendMessage(message.key.remoteJid, {
                     react: {
                         text: emoji,
                         key: message.key
@@ -1410,7 +1443,7 @@ if (conf.AUTO_REACT_STATUS === "yes") {
     
     let lastReactionTime = 0;
 
-    adams.ev.on("messages.upsert", async (m) => {
+    vortex.ev.on("messages.upsert", async (m) => {
         const { messages } = m;
         
         const reactionEmojis = (conf.STATUS_REACT_EMOJIS || "🚀,🌎,♻️").split(",").map(e => e.trim());
@@ -1420,13 +1453,13 @@ if (conf.AUTO_REACT_STATUS === "yes") {
                 const now = Date.now();
                 if (now - lastReactionTime < 5000) continue; // 5-second cooldown
 
-                const botJid = adams.user?.id ? `${adams.user.id.split(':')[0]}@s.whatsapp.net` : null;
+                const botJid = vortex.user?.id ? `${vortex.user.id.split(':')[0]}@s.whatsapp.net` : null;
                 if (!botJid) continue;
 
                 try {
                     const randomEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
 
-                    await adams.sendMessage(message.key.remoteJid, {
+                    await vortex.sendMessage(message.key.remoteJid, {
                         react: {
                             key: message.key,
                             text: randomEmoji,
@@ -1448,7 +1481,7 @@ if (conf.AUTO_REACT_STATUS === "yes") {
 
 
 const googleTTS = require("google-tts-api");
-const { createContext2 } = require("./Ibrahim/helper2");
+const { createContext2 } = require('./Hans/helper2");
 
 const availableApis = [
    // "https://bk9.fun/ai/jeeves-chat2?q=",
@@ -1523,7 +1556,7 @@ async function getAIResponse(query) {
             }
 
             if (isIdentityQuestion) {
-                aiResponse = 'I am ULTRAXAS XMD, created by Ibrahim Adams! 🚀';
+                aiResponse = 'I am VORTEX XMD, created by HansTz! 🚀';
             }
             
             return aiResponse;
@@ -1531,19 +1564,19 @@ async function getAIResponse(query) {
             // If JSON parse fails, try to get as text
             const textResponse = await response.text();
             return isIdentityQuestion 
-                ? `I am ULTRAXAS XMD, created by Ibrahim Adams! 🚀`
+                ? `I am VORTEX XMD, created by HansTz! 🚀`
                 : textResponse;
         }
     } catch (error) {
         console.error("API Error:", error);
         return isIdentityQuestion 
-            ? "I'm ULTRAXAS XMD, created by Ibrahim Adams! 🚀"
+            ? "I'm VORTEX XMD, created by HansTz! 🚀"
             : "Sorry, I couldn't get a response right now";
     }
 }
 
 if (conf.CHATBOT === "yes" || conf.CHATBOT1 === "yes") {
-    adams.ev.on("messages.upsert", async ({ messages }) => {
+    vortex.ev.on("messages.upsert", async ({ messages }) => {
         try {
             const msg = messages[0];
             if (!msg?.message || msg.key.fromMe) return;
@@ -1565,7 +1598,7 @@ if (conf.CHATBOT === "yes" || conf.CHATBOT1 === "yes") {
 
             // Text response
             if (conf.CHATBOT === "yes") {
-                await adams.sendMessage(jid, { 
+                await vortex.sendMessage(jid, { 
                     text: String(aiResponse),
                     ...createContext(jid, {
                         title: "ʙᴡᴍ xᴍᴅ ᴄʜᴀᴛʙᴏᴛ ᴄᴏɴᴠᴇʀsᴀᴛɪᴏɴ",
@@ -1584,7 +1617,7 @@ if (conf.CHATBOT === "yes" || conf.CHATBOT1 === "yes") {
                         host: "https://translate.google.com",
                     });
 
-                    await adams.sendMessage(jid, {
+                    await vortex.sendMessage(jid, {
                         audio: { url: audioUrl },
                         mimetype: "audio/mpeg",
                         ptt: true,
@@ -1607,7 +1640,7 @@ if (conf.CHATBOT === "yes" || conf.CHATBOT1 === "yes") {
     return linkPattern.test(message);
 };
 
-adams.ev.on('messages.upsert', async (msg) => {
+vortex.ev.on('messages.upsert', async (msg) => {
     try {
         const { messages } = msg;
         const message = messages[0];
@@ -1620,7 +1653,7 @@ adams.ev.on('messages.upsert', async (msg) => {
 
         if (!isGroup) return; // Skip non-group messages
 
-        const groupMetadata = await adams.groupMetadata(from); // Fetch group metadata
+        const groupMetadata = await vortex.groupMetadata(from); // Fetch group metadata
         const groupAdmins = groupMetadata.participants
             .filter((member) => member.admin)
             .map((admin) => admin.id);
@@ -1641,16 +1674,16 @@ adams.ev.on('messages.upsert', async (msg) => {
             // Check for any link
             if (isAnyLink(body)) {
                 // Delete the message
-                await adams.sendMessage(from, { delete: message.key });
+                await vortex.sendMessage(from, { delete: message.key });
 
                 // Remove the sender from the group
-                await adams.groupParticipantsUpdate(from, [sender], 'remove');
+                await vortex.groupParticipantsUpdate(from, [sender], 'remove');
 
                 // Send a notification to the group
-                await adams.sendMessage(
+                await vortex.sendMessage(
                     from,
                     {
-                        text: `⚠️Ultraxas md anti-link online!\n User @${sender.split('@')[0]} has been removed for sharing a link.`,
+                        text: `⚠️VORTEX md anti-link online!\n User @${sender.split('@')[0]} has been removed for sharing a link.`,
                         mentions: [sender],
                     }
                 );
@@ -1683,18 +1716,18 @@ adams.ev.on('messages.upsert', async (msg) => {
         //============================================================================/
 
         // MAIN COMMAND PROCESSING WITH FIXED AUTHORIZATION LOGIC
-        adams.ev.on("messages.upsert", async ({ messages }) => {
+        vortex.ev.on("messages.upsert", async ({ messages }) => {
             const ms = messages[0];
             if (!ms?.message || !ms?.key) return;
 
             const origineMessage = standardizeJid(ms.key.remoteJid);
-            const idBot = standardizeJid(adams.user?.id);
+            const idBot = standardizeJid(vortex.user?.id);
             const verifGroupe = origineMessage.endsWith("@g.us");
             
             let infosGroupe = null;
             let nomGroupe = '';
             try {
-                infosGroupe = verifGroupe ? await adams.groupMetadata(origineMessage).catch(() => null) : null;
+                infosGroupe = verifGroupe ? await vortex.groupMetadata(origineMessage).catch(() => null) : null;
                 nomGroupe = infosGroupe?.subject || '';
             } catch (err) {
                 console.error("Group metadata error:", err);
@@ -1721,7 +1754,7 @@ adams.ev.on('messages.upsert', async (msg) => {
 
             // SUPERUSER DETECTION (ONLY FOR PRIVATE CHATS)
             const SUDO_NUMBERS = [
-                "254710772666", 
+                "255753668403", 
                 "254106727593"
             ];
 
@@ -1895,7 +1928,7 @@ adams.ev.on('messages.upsert', async (msg) => {
                         const repondre = async (text, options = {}) => {
                             if (typeof text !== 'string') return;
                             try {
-                                await adams.sendMessage(origineMessage, { 
+                                await vortex.sendMessage(origineMessage, { 
                                     text,
                                     ...createContext(auteurMessage, {
                                         title: options.title || nomGroupe || "BWM-XMD",
@@ -1910,7 +1943,7 @@ adams.ev.on('messages.upsert', async (msg) => {
 
                         if (cmd.reaction) {
                             try {
-                                await adams.sendMessage(origineMessage, {
+                                await vortex.sendMessage(origineMessage, {
                                     react: { 
                                         key: ms.key, 
                                         text: cmd.reaction 
@@ -1950,7 +1983,7 @@ adams.ev.on('messages.upsert', async (msg) => {
                         if (await workerManager.handleAuthError(error)) return;
                         
                         try {
-                            await adams.sendMessage(origineMessage, {
+                            await vortex.sendMessage(origineMessage, {
                                 text: `🚨 Command failed: ${error.message}`,
                                 ...createContext(auteurMessage, {
                                     title: "Error",
@@ -1966,7 +1999,7 @@ adams.ev.on('messages.upsert', async (msg) => {
         });
 
        
-    adams.ev.on("connection.update", async (update) => {
+    vortex.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect, qr } = update;
 
     if (qr) {
@@ -1979,29 +2012,29 @@ adams.ev.on('messages.upsert', async (msg) => {
     }
 
     if (connection === "open") {
-        console.log("🌎 ULTRAXAS XMD ONLINE 🌎");
+        console.log("🌎 VORTEX XMD ONLINE 🌎");
         reconnectAttempts = 0;
         
         setTimeout(async () => {
             try {
-                console.log('🚀 Enjoy Ultraxas md speed 🌎');
+                console.log('🚀 Enjoy VORTEX md speed 🌎');
                 
                 if (conf.DP === "yes") {
                     const md = conf.MODE === "yes" ? "public" : "private";
                     const connectionMsg = `┌─❖
-│ULTRAXAS XMD 
+│VORTEX XMD 
 │ ✅ Prefix: [ ${conf.PREFIX} ] 
 │ ☣️ Mode: *${md}*
 │ 🔄 Auto-fix: *ONLINE*
 └─────────────────┈ ⳹`;
 
-                    await adams.sendMessage(
-                        adams.user.id,
+                    await vortex.sendMessage(
+                        vortex.user.id,
                         {
                             text: connectionMsg,
                             ...createContext("BWM XMD", {
                                 title: "SYSTEM ONLINE",
-                                body: "ULTRAXAS XMD"
+                                body: "VORTEX XMD"
                             })
                         },
                         {
