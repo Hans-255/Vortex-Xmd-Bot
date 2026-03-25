@@ -5,6 +5,9 @@ const path = require("path");
 const AdmZip = require("adm-zip");
 const { setCommitHash, getCommitHash } = require('../data/updateDB');
 
+const BOT_REPO = 'Hans-255/Vortex-Xmd-Bot';
+const REPO_API = `https://api.github.com/repos/${BOT_REPO}`;
+
 cmd({
     pattern: "update",
     alias: ["upgrade", "sync"],
@@ -16,55 +19,53 @@ cmd({
     if (!isOwner) return reply("This command is only for the bot owner.");
 
     try {
-        await reply("🔍 Checking for VORTEX XMD UPDATES...");
+        await reply("🔍 Checking for VORTEX XMD updates...");
 
-        // Fetch the latest commit hash from GitHub
-        const { data: commitData } = await axios.get("https://github.com/VORTEX XMD/VORTEX XMD/commits/main");
+        const { data: commitData } = await axios.get(`${REPO_API}/commits/main`, {
+            headers: { 'User-Agent': 'VORTEX-XMD-Bot' }
+        });
         const latestCommitHash = commitData.sha;
-
-        // Get the stored commit hash from the database
         const currentHash = await getCommitHash();
 
         if (latestCommitHash === currentHash) {
             return reply("✅ Your VORTEX XMD bot is already up-to-date!");
         }
 
-        await reply("🚀 Updating VORTEX XMD Bot...");
+        await reply("🚀 Downloading latest VORTEX XMD update...");
 
-        // Download the latest code
         const zipPath = path.join(__dirname, "latest.zip");
-        const { data: zipData } = await axios.get("https://github.com/VORTEX XMD/VORTEX XMD/archive/main.zip", { responseType: "arraybuffer" });
+        const { data: zipData } = await axios.get(
+            `https://github.com/${BOT_REPO}/archive/refs/heads/main.zip`,
+            { responseType: "arraybuffer", headers: { 'User-Agent': 'VORTEX-XMD-Bot' } }
+        );
         fs.writeFileSync(zipPath, zipData);
 
-        // Extract ZIP file
         await reply("📦 Extracting the latest code...");
         const extractPath = path.join(__dirname, 'latest');
         const zip = new AdmZip(zipPath);
         zip.extractAllTo(extractPath, true);
 
-        // Copy updated files, preserving config.js and app.json
         await reply("🔄 Replacing files...");
-        const sourcePath = path.join(extractPath, "VORTEX XMD-main");
+        const repoFolderName = BOT_REPO.split('/')[1] + '-main';
+        const sourcePath = path.join(extractPath, repoFolderName);
         const destinationPath = path.join(__dirname, '..');
         copyFolderSync(sourcePath, destinationPath);
 
-        // Save the latest commit hash to the database
         await setCommitHash(latestCommitHash);
 
-        // Cleanup
         fs.unlinkSync(zipPath);
         fs.rmSync(extractPath, { recursive: true, force: true });
 
-        await reply("✅ Update complete! Restarting the bot...");
+        await reply("✅ Update complete! Restarting VORTEX XMD...");
         process.exit(0);
     } catch (error) {
         console.error("Update error:", error);
-        return reply("❌ Update failed. Please try manually.");
+        return reply(`❌ Update failed: ${error.message}`);
     }
 });
 
-// Helper function to copy directories while preserving config.js and app.json
 function copyFolderSync(source, target) {
+    if (!fs.existsSync(source)) return;
     if (!fs.existsSync(target)) {
         fs.mkdirSync(target, { recursive: true });
     }
@@ -74,8 +75,7 @@ function copyFolderSync(source, target) {
         const srcPath = path.join(source, item);
         const destPath = path.join(target, item);
 
-        // Skip config.js and app.json
-        if (item === "config.js" || item === "app.json") {
+        if (item === "config.js" || item === "app.json" || item === "config.env") {
             console.log(`Skipping ${item} to preserve custom settings.`);
             continue;
         }

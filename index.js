@@ -47,6 +47,12 @@ const prefix = config.PREFIX
 
 const ownerNumber = ['255753668403']
 
+// Global identity variables used in vcards and contact info
+global.OwnerName = config.OWNER_NAME || 'HansTz';
+global.github = 'mrhanstz';
+global.email = 't.me/HansTz';
+global.location = 'Tanzania';
+
 const tempDir = path.join(os.tmpdir(), 'cache-temp')
 if (!fs.existsSync(tempDir)) {
   fs.mkdirSync(tempDir)
@@ -771,7 +777,7 @@ setInterval(async () => {
             global.email
           }\nitem2.X-ABLabel:GitHub\nitem3.URL:https://github.com/${
             global.github
-          }/Wa-his-v1.0\nitem3.X-ABLabel:GitHub\nitem4.ADR:;;${
+          }/Vortex-Xmd\nitem3.X-ABLabel:GitHub\nitem4.ADR:;;${
             global.location
           };;;;\nitem4.X-ABLabel:Region\nEND:VCARD`,
         })

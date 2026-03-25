@@ -25,7 +25,7 @@ cmd({
   filename: __filename
 }, async (conn, m, match, { from, quoted, args, reply }) => {
   const link = args[0];
-  if (!link) return reply("📎 Please provide a GitHub link.\n\nExample:\n.gitclone https://github.com/VORTEX XMD/VORTEX XMD");
+  if (!link) return reply("📎 Please provide a GitHub link.\n\nExample:\n.gitclone https://github.com/mrhanstz/Vortex-Xmd");
 
   if (!/^https:\/\/github\.com\/[^\/]+\/[^\/]+/.test(link)) {
     return reply("⚠️ Invalid GitHub URL.");

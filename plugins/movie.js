@@ -54,7 +54,7 @@ async (conn, mek, m, { from, reply, sender, args }) => {
             from,
             {
                 image: { 
-                    url: movie.poster && movie.poster !== 'N/A' ? movie.poster : 'https://github.com/VORTEX XMD/HansTz-DATA/raw/refs/heads/main/image/allmenu.jpg'
+                    url: movie.poster && movie.poster !== 'N/A' ? movie.poster : require('../lib/media').getRandomImage()
                 },
                 caption: dec,
                 contextInfo: {

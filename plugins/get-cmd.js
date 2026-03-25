@@ -43,7 +43,7 @@ Powered By *VORTEX XMD🤙*`;
 
         // Send image with truncated source code
         await conn.sendMessage(from, { 
-            image: { url: `https://github.com/VORTEX XMD/HansTz-DATA/raw/refs/heads/main/image/allmenu.jpg` },  // Image URL
+            image: { url: require('../lib/media').getRandomImage() },
             caption: formattedCode,
             contextInfo: {
                 mentionedJid: [m.sender],
