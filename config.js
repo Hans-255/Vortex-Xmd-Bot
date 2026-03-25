@@ -117,7 +117,7 @@ class HybridConfigManager {
                 GOODBYE_MESSAGE: process.env.GOODBYE_MESSAGE || 'no',
                 AUTO_REJECT_CALL: process.env.AUTO_REJECT_CALL || 'no',
                 WELCOME_MESSAGE: process.env.WELCOME_MESSAGE || 'no',
-                GROUPANTILINK: process.env.GROUPANTILINK || 'no',
+                GROUPANTILINK_REMOVE: process.env.GROUPANTILINK_REMOVE || process.env.GROUPANTILINK || 'no',
                 AUTO_REPLY_STATUS: process.env.AUTO_REPLY_STATUS || 'no'
             }
         };
@@ -380,7 +380,7 @@ module.exports = {
     get ANTICALL() { return hybridConfig.getSetting('AUTO_REJECT_CALL', 'no'); },
     get WELCOME_MESSAGE() { return hybridConfig.getSetting('WELCOME_MESSAGE', 'no'); },
     get GROUP_ANTILINK2() { return process.env.GROUPANTILINK_DELETE_ONLY || 'yes'; },
-    get GROUP_ANTILINK() { return hybridConfig.getSetting('GROUPANTILINK', 'no'); },
+    get GROUP_ANTILINK() { return hybridConfig.getSetting('GROUPANTILINK_REMOVE', 'no') || hybridConfig.getSetting('GROUPANTILINK', 'no'); },
     get STATUS_REACT_EMOJIS() { return process.env.STATUS_REACT_EMOJIS || ""; },
     get REPLY_STATUS_TEXT() { return process.env.REPLY_STATUS_TEXT || ""; },
     get AUTO_REACT() { return hybridConfig.getSetting('AUTO_REACT', 'no'); },
