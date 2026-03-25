@@ -1,7 +1,7 @@
 global.conf = require('./config');
 const makeWASocket = require("@whiskeysockets/baileys").default
 const logger = require("@whiskeysockets/baileys/lib/Utils/logger").default.child({});
-const { createContext } = require('./Hans/helper");
+const { createContext } = require('./Hans/helper');
 const pino = require("pino");
 const { Boom } = require("@hapi/boom");
 const conf = require("./config");
@@ -14,7 +14,7 @@ const path = require("path");
 const https = require('https');
 const FileType = require("file-type");
 const { Sticker, createSticker, StickerTypes } = require("wa-sticker-formatter");
-const evt = require('./Hans/adams");
+const evt = require('./Hans/adams');
 
 // ═══════ GITHUB MEDIA ═══════
 const GITHUB_IMAGES_API = 'https://api.github.com/repos/Mrhanstz/HansTz-Sever/contents/Database';
@@ -1481,7 +1481,7 @@ if (conf.AUTO_REACT_STATUS === "yes") {
 
 
 const googleTTS = require("google-tts-api");
-const { createContext2 } = require('./Hans/helper2");
+const { createContext2 } = require('./Hans/helper2');
 
 const availableApis = [
    // "https://bk9.fun/ai/jeeves-chat2?q=",
