@@ -1,4 +1,4 @@
-const {adams} = require("../Ibrahim/adams");
+const {adams} = require("../HansTz/adams");
 const fs = require('fs-extra');
 const conf = require('../config');
 const { default: axios } = require("axios");
@@ -46,7 +46,7 @@ adams({
         document: { url: appDetails.BK9.dllink },
         fileName: `${appDetails.BK9.name}.apk`,
         mimetype: "application/vnd.android.package-archive",
-        caption: "ULTRAXAS XMD"
+        caption: "VORTEX XMD"
       },
       { quoted: ms }
     );

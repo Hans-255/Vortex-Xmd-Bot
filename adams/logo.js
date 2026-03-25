@@ -1,4 +1,4 @@
-const { adams } = require("../Ibrahim/adams");
+const { adams } = require("../HansTz/adams");
 var mumaker = require("mumaker");
 
 const logoCommands = [
@@ -136,7 +136,7 @@ logoCommands.forEach(({ nomCom, categorie, reaction, makerUrl }) => {
     const { arg, repondre, ms, prefixe } = commandeOptions;
 
     if (!arg || arg == "") {
-      repondre(`Exemple of using commande:\n ${prefixe}${nomCom} Ibrahim Adams`);
+      repondre(`Exemple of using commande:\n ${prefixe}${nomCom} HansTz`);
       return;
     }
 

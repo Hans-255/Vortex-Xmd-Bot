@@ -1,4 +1,4 @@
-const {adams} = require('../Ibrahim/adams');
+const {adams} = require("../HansTz/adams');
 const fs = require("fs");
 const { exec } = require("child_process");
 

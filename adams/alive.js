@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { adams } = require("../Ibrahim/adams");
+const { adams } = require("../HansTz/adams");
 const axios = require("axios");
 
 const githubRawBaseUrl =

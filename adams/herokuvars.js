@@ -1,4 +1,4 @@
-const { adams } = require("../Ibrahim/adams");
+const { adams } = require("../HansTz/adams");
 const { hybridConfig } = require("../config");
 
 // Helper function to validate configuration
@@ -134,7 +134,7 @@ adams(
                         ? "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg"
                         : "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg";
 
-                const message = `🌟 *ULTRAXAS XMD HYBRID SETTINGS* 🌟\n📌 Reply with a number to toggle a variable\n (Page ${
+                const message = `🌟 *VORTEX XMD HYBRID SETTINGS* 🌟\n📌 Reply with a number to toggle a variable\n (Page ${
                     pageIndex + 1
                 }/${pages.length})\n\n💾 *Storage Mode:* ${storageMode}\n🔄 *Session ID:* ${sessionId.slice(-8)}\n⚡ *Status:* ${hybridConfig.isHerokuAvailable ? 'Synced' : 'Local Only'}\n\n${pages[pageIndex].join(
                     "\n"

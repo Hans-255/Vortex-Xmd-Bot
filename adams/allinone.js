@@ -1,7 +1,7 @@
 
 
-const { adams } = require('../Ibrahim/adams');
-const traduire = require("../Ibrahim/traduction") ;
+const { adams } = require("../HansTz/adams');
+const traduire = require("../HansTz/traduction") ;
 const { default: axios } = require('axios');
 const pkg = require('@whiskeysockets/baileys');
 const { generateWAMessageFromContent, proto } = pkg;

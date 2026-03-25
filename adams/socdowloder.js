@@ -1,7 +1,7 @@
-const { adams } = require('../Ibrahim/adams');
+const { adams } = require("../HansTz/adams');
 const axios = require('axios');
 const fs = require('fs-extra');
-const { mediafireDl } = require("../Ibrahim/Function");
+const { mediafireDl } = require("../HansTz/Function");
 const conf = require(__dirname + "/../config");
 const ffmpeg = require("fluent-ffmpeg");
 const gis = require('g-i-s');
@@ -94,7 +94,7 @@ adams({
         if (isVideo) {
             await zk.sendMessage(dest, {
                 video: { url: downloadUrl },
-                caption: 'Downloaded by ULTRAXAS XMD',
+                caption: 'Downloaded by VORTEX XMD',
                 gifPlayback: false
             }, { quoted: ms });
         } else if (isAudio) {
@@ -106,7 +106,7 @@ adams({
         } else if (isImage) {
             await zk.sendMessage(dest, {
                 image: { url: downloadUrl },
-                caption: 'Downloaded by ULTRAXAS XMD'
+                caption: 'Downloaded by VORTEX XMD'
             }, { quoted: ms });
         } else {
             // Default to document for unknown types
@@ -159,7 +159,7 @@ adams({
             audio: { url: audioUrl },
             mimetype: 'audio/mpeg',
             fileName: 'youtube_audio.mp3',
-            caption: 'YouTube audio downloaded by ULTRAXAS XMD'
+            caption: 'YouTube audio downloaded by VORTEX XMD'
         }, { quoted: ms });
 
     } catch (error) {
@@ -195,7 +195,7 @@ adams({
             audio: { url: audioUrl },
             mimetype: 'audio/mpeg',
             fileName: 'ringtone.mp3',
-            caption: `Ringtone: ${video.title} - Downloaded by ULTRAXAS XMD`
+            caption: `Ringtone: ${video.title} - Downloaded by VORTEX XMD`
         }, { quoted: ms });
 
     } catch (error) {

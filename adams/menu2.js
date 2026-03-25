@@ -1,4 +1,4 @@
-const { adams } = require("../Ibrahim/adams");
+const { adams } = require("../HansTz/adams");
 const moment = require("moment-timezone");
 const s = require(__dirname + "/../config");
 const axios = require("axios");
@@ -7,7 +7,7 @@ const PREFIX = s.PREFIX;
 
 // Configurable elements from config.js
 const {
-    BOT: BOT_NAME = 'ULTRAXAS XMD',
+    BOT: BOT_NAME = 'VORTEX XMD',
     BOT_URL: MEDIA_URLS = [],
     MENU_TOP_LEFT = "┌─❖",
     MENU_BOT_NAME_LINE = "│ ",
@@ -73,7 +73,7 @@ adams({ nomCom: "menu", categorie: "General" }, async (dest, zk, commandeOptions
     const contactName = commandeOptions?.ms?.pushName || "Unknown Contact";
     const sender = commandeOptions?.sender || (commandeOptions?.ms?.key?.remoteJid || "").replace(/@.+/, '');
     let { ms, repondre } = commandeOptions;
-    let { cm } = require(__dirname + "/../Ibrahim/adams");
+    let { cm } = require("../HansTz/adams");
 
     // Contact message for quoted replies
     const contactMsg = {

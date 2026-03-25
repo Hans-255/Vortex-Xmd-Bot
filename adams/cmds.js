@@ -1,4 +1,4 @@
-const { adams } = require("../Ibrahim/adams");
+const { adams } = require("../HansTz/adams");
 const moment = require("moment-timezone");
 const s = require(__dirname + "/../config");
 
@@ -11,7 +11,7 @@ commandTriggers.forEach(trigger => {
         categorie: "General" 
     }, async (dest, zk, commandeOptions) => {
         const { ms, repondre, auteurMsg } = commandeOptions;
-        const { cm } = require("../Ibrahim/adams");
+        const { cm } = require("../HansTz/adams");
         
         // Get user's push name or default
         const userName = commandeOptions?.ms?.pushName || "User";
@@ -53,7 +53,7 @@ commandTriggers.forEach(trigger => {
             mentionedJid: [auteurMsg],
             forwardedNewsletterMessageInfo: {
                 newsletterJid: "120363418485111392@newsletter",
-                newsletterName: "ULTRAXAS XMD",
+                newsletterName: "VORTEX XMD",
                 serverMessageId: Math.floor(100000 + Math.random() * 900000)
             }
         };
@@ -61,7 +61,7 @@ commandTriggers.forEach(trigger => {
         // Main menu message with your requested format
         const message = `
 ┌─❖ 𓆩 ⚡ 𓆪 ❖─┐
-       ULTRAXAS XMD  
+       VORTEX XMD  
 └─❖ 𓆩 ⚡ 𓆪 ❖─┘  
 
 👤 ᴜsᴇʀ ɴᴀᴍᴇ: ${userName}

@@ -1,7 +1,7 @@
 global.conf = require('./config');
 const makeWASocket = require("@whiskeysockets/baileys").default
 const logger = require("@whiskeysockets/baileys/lib/Utils/logger").default.child({});
-const { createContext } = require("./Ibrahim/helper");
+const { createContext } = require("./HansTz/helper");
 const pino = require("pino");
 const { Boom } = require("@hapi/boom");
 const conf = require("./config");
@@ -14,7 +14,7 @@ const path = require("path");
 const https = require('https');
 const FileType = require("file-type");
 const { Sticker, createSticker, StickerTypes } = require("wa-sticker-formatter");
-const evt = require("./Ibrahim/adams");
+const evt = require("./HansTz/adams");
 const rateLimit = new Map();
 const MAX_RATE_LIMIT_ENTRIES = 100000;
 const RATE_LIMIT_WINDOW = 3000;
@@ -125,7 +125,7 @@ class WorkerManager {
             // Clean session if required
             if (cleanSession || this.authErrorCount >= this.maxAuthErrors) {
                 try {
-                    const sessionDir = path.join(__dirname, "Ibrahim");
+                    const sessionDir = path.join(__dirname, "sessions");
                     if (fs.existsSync(sessionDir)) {
                         await fs.remove(sessionDir);
                         console.log('✅ Session directory cleaned');
@@ -527,57 +527,47 @@ function atbverifierEtatJid(jid) {
 // ENHANCED AUTHENTICATION FUNCTION WITH BETTER ERROR HANDLING
 async function authentification() {
     try {
-        const sessionDir = path.join(__dirname, "Ibrahim");
-        
+        const sessionDir = path.join(__dirname, 'sessions');
         if (!fs.existsSync(sessionDir)) {
             fs.mkdirSync(sessionDir, { recursive: true });
         }
         
-        const credsPath = path.join(sessionDir, "creds.json");
+        const credsPath = path.join(sessionDir, 'creds.json');
         
-        if (!fs.existsSync(credsPath) || conf.session !== "zokk") {
-            console.log("Setting up session...");
+        if (!fs.existsSync(credsPath)) {
+            console.log('📥 Downloading session from Mega...');
             
-            if (!conf.session || conf.session === "zokk") {
-                throw new Error("No valid session provided");
+            if (!conf.session) {
+                throw new Error('No SESSION_ID provided. Set SESSION_ID starting with HansTz&');
             }
             
-            const [header, b64data] = conf.session.split(';;;');
+            const megaId = conf.session.replace('HansTz&', '');
+            const filer = File.fromURL('https://mega.nz/file/' + megaId);
             
-            if (header !== "ULTRAXAS-MD" || !b64data) {
-                throw new Error("Invalid session format");
-            }
-            
-            try {
-                const cleanB64 = b64data.replace(/\.\.\./g, '');
-                const compressedData = Buffer.from(cleanB64, 'base64');
-                const decompressedData = zlib.gunzipSync(compressedData);
-                
-                const parsedData = JSON.parse(decompressedData.toString());
-                
-                if (!parsedData.noiseKey || !parsedData.signedIdentityKey) {
-                    throw new Error("Invalid session structure");
-                }
-                
-                fs.writeFileSync(credsPath, decompressedData, "utf8");
-                console.log("✅ Session file created successfully");
-            } catch (parseError) {
-                throw new Error(`Invalid session data: ${parseError.message}`);
-            }
+            await new Promise((resolve, reject) => {
+                filer.download((err, data) => {
+                    if (err) return reject(new Error('Failed to download session from Mega: ' + err.message));
+                    try {
+                        fs.writeFileSync(credsPath, data);
+                        console.log('✅ Session downloaded and saved successfully');
+                        resolve();
+                    } catch (writeErr) {
+                        reject(new Error('Failed to save session: ' + writeErr.message));
+                    }
+                });
+            });
         }
     } catch (error) {
-        console.error("❌ Session setup failed:", error.message);
-        
-        const sessionDir = path.join(__dirname, "Ibrahim");
+        console.error('❌ Session setup failed:', error.message);
+        const sessionDir = path.join(__dirname, 'sessions');
         if (fs.existsSync(sessionDir)) {
             fs.rmSync(sessionDir, { recursive: true, force: true });
         }
-        
         throw error;
     }
 }
 
-module.exports = { authentification };
+;
 
 let zk;
 let store;
@@ -591,7 +581,7 @@ async function main() {
         await authentification();
         
         const { version, isLatest } = await fetchLatestBaileysVersion();
-        const { state, saveCreds } = await useMultiFileAuthState(__dirname + "/Ibrahim");
+        const { state, saveCreds } = await useMultiFileAuthState(__dirname + "/sessions");
         
         if (store) {
             store.destroy();
@@ -601,7 +591,7 @@ async function main() {
         const sockOptions = {
             version,
             logger: pino({ level: "silent" }),
-            browser: ['ultra', "safari", "1.0.0"],
+            browser: ['VORTEX XMD', "safari", "1.0.0"],
             printQRInTerminal: false,
             auth: {
                 creds: state.creds,
@@ -1128,7 +1118,7 @@ if (conf.AUTO_REPLY_STATUS === "yes") {
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
                                 newsletterJid: "120363418485111392@newsletter",
-                                newsletterName: "ULTRAXAS XMD",
+                                newsletterName: "VORTEX XMD",
                                 serverMessageId: Math.floor(100000 + Math.random() * 900000),
                             }
                         }
@@ -1258,7 +1248,7 @@ adams.ev.on('group-participants.update', async (update) => {
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
                                 newsletterJid: "120363418485111392@newsletter",
-                                newsletterName: "ULTRAXAS XMD",
+                                newsletterName: "VORTEX XMD",
                                 serverMessageId: Math.floor(100000 + Math.random() * 900000),
                             },
                         }
@@ -1293,7 +1283,7 @@ adams.ev.on('group-participants.update', async (update) => {
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
                                 newsletterJid: "120363418485111392@newsletter",
-                                newsletterName: "ULTRAXAS XMD",
+                                newsletterName: "VORTEX XMD",
                                 serverMessageId: Math.floor(100000 + Math.random() * 900000),
                             },
                         }
@@ -1448,7 +1438,7 @@ if (conf.AUTO_REACT_STATUS === "yes") {
 
 
 const googleTTS = require("google-tts-api");
-const { createContext2 } = require("./Ibrahim/helper2");
+const { createContext2 } = require("./HansTz/helper2");
 
 const availableApis = [
    // "https://bk9.fun/ai/jeeves-chat2?q=",
@@ -1523,7 +1513,7 @@ async function getAIResponse(query) {
             }
 
             if (isIdentityQuestion) {
-                aiResponse = 'I am ULTRAXAS XMD, created by Ibrahim Adams! 🚀';
+                aiResponse = 'I am VORTEX XMD, created by HansTz! 🚀';
             }
             
             return aiResponse;
@@ -1531,13 +1521,13 @@ async function getAIResponse(query) {
             // If JSON parse fails, try to get as text
             const textResponse = await response.text();
             return isIdentityQuestion 
-                ? `I am ULTRAXAS XMD, created by Ibrahim Adams! 🚀`
+                ? `I am VORTEX XMD, created by HansTz! 🚀`
                 : textResponse;
         }
     } catch (error) {
         console.error("API Error:", error);
         return isIdentityQuestion 
-            ? "I'm ULTRAXAS XMD, created by Ibrahim Adams! 🚀"
+            ? "I'm VORTEX XMD, created by HansTz! 🚀"
             : "Sorry, I couldn't get a response right now";
     }
 }
@@ -1979,7 +1969,7 @@ adams.ev.on('messages.upsert', async (msg) => {
     }
 
     if (connection === "open") {
-        console.log("🌎 ULTRAXAS XMD ONLINE 🌎");
+        console.log("🌎 VORTEX XMD ONLINE 🌎");
         reconnectAttempts = 0;
         
         setTimeout(async () => {
@@ -1989,7 +1979,7 @@ adams.ev.on('messages.upsert', async (msg) => {
                 if (conf.DP === "yes") {
                     const md = conf.MODE === "yes" ? "public" : "private";
                     const connectionMsg = `┌─❖
-│ULTRAXAS XMD 
+│VORTEX XMD 
 │ ✅ Prefix: [ ${conf.PREFIX} ] 
 │ ☣️ Mode: *${md}*
 │ 🔄 Auto-fix: *ONLINE*
@@ -2001,7 +1991,7 @@ adams.ev.on('messages.upsert', async (msg) => {
                             text: connectionMsg,
                             ...createContext("BWM XMD", {
                                 title: "SYSTEM ONLINE",
-                                body: "ULTRAXAS XMD"
+                                body: "VORTEX XMD"
                             })
                         },
                         {

@@ -1,4 +1,4 @@
-const { adams } = require("../Ibrahim/adams");
+const { adams } = require("../HansTz/adams");
 
 // Utility function to extract JID from different formats
 function extractJID(input) {

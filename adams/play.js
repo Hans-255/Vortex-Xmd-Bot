@@ -1,4 +1,4 @@
-const { adams } = require("../Ibrahim/adams");
+const { adams } = require("../HansTz/adams");
 const axios = require("axios");
 const ytSearch = require("yt-search");
 
@@ -215,7 +215,7 @@ async function handleDownload(type, videoUrl, dest, zk, originalMsg) {
                 contextInfo: {
                     externalAdReply: {
                         title: "Your Audio Download",
-                        body: "ULTRAXAS XMD",
+                        body: "VORTEX XMD",
                         mediaType: 2,
                         thumbnailUrl: "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg",
                         mediaUrl: downloadUrl,
@@ -234,7 +234,7 @@ async function handleDownload(type, videoUrl, dest, zk, originalMsg) {
                 contextInfo: {
                     externalAdReply: {
                         title: "Your Video Download",
-                        body: "ULTRAXAS XMD",
+                        body: "VORTEX XMD",
                         mediaType: 2,
                         thumbnailUrl: "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg",
                         mediaUrl: downloadUrl,

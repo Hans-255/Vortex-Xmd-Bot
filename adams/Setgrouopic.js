@@ -1,4 +1,4 @@
-const { adams } = require('../Ibrahim/adams');
+const { adams } = require("../HansTz/adams');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 const fs = require('fs-extra');
 const path = require('path');
@@ -277,7 +277,7 @@ adultComList.forEach((nomCom) => {
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
             newsletterJid: "120363418485111392@newsletter",
-            newsletterName: "ULTRAXAS XMD",
+            newsletterName: "VORTEX XMD",
             serverMessageId: Math.floor(Math.random() * 1000),
           },
           externalAdReply: {
