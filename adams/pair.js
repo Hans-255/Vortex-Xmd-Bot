@@ -1,4 +1,4 @@
-const { adams } = require('../HansTz/adams');
+const { adams } = require('../Ibrahim/adams');
 const { default: axios } = require('axios');
 const pkg = require('@whiskeysockets/baileys');
 const { generateWAMessageFromContent, prepareWAMessageMedia } = pkg;
@@ -119,7 +119,7 @@ adams({ nomCom: "scan", reaction: "🔍", categorie: "pair" }, async (dest, zk, 
 
     try {
         const instructions = `
-*📖 HOW TO GET VORTEX XMD SESSION:*
+*📖 HOW TO GET ULTRAXAS XMD SESSION:*
 
 1️⃣ **Open the link below**
 
@@ -131,15 +131,15 @@ adams({ nomCom: "scan", reaction: "🔍", categorie: "pair" }, async (dest, zk, 
 
 3️⃣ **Receive a Code**  
 
-   👉 HansTz will send a short code, Copy it to your keyboard.  
+   👉 Ibrahim Tech will send a short code, Copy it to your keyboard.  
 
 4️⃣ **Check WhatsApp Notification**  
 
-   👉 WhatsApp will notify you. Tap on the notification and enter the code sent by HansTz.  
+   👉 WhatsApp will notify you. Tap on the notification and enter the code sent by Ibrahim Tech.  
 
 5️⃣ **Wait for the Session**  
 
-   👉 After loading, it will link then HansTz will send a session to your WhatsApp number.  
+   👉 After loading, it will link then Ibrahim Tech will send a session to your WhatsApp number.  
 
 6️⃣ **Copy and Share the Session**  
 

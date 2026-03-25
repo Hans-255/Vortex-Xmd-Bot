@@ -1,7 +1,7 @@
-const { adams } = require("../HansTz/adams');
+const { adams } = require('../Ibrahim/adams');
 const axios = require('axios');
 const conf = require(__dirname + "/../config");
-const { dare, truth, random_question, amount_of_questions } = require("../HansTz/handler.js');
+const { dare, truth, random_question, amount_of_questions } = require('../Ibrahim/handler.js');
 
 
 adams({

@@ -1,4 +1,4 @@
-const { adams } = require("../HansTz/adams');
+const { adams } = require('../Ibrahim/adams');
 const gis = require('g-i-s');
 const axios = require('axios');
 const conf = require(__dirname + '/../config');

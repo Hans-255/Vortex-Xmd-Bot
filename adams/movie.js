@@ -1,5 +1,5 @@
 
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 const axios = require("axios");
 const ytSearch = require("yt-search");
 
@@ -61,7 +61,7 @@ adams({
   // Common newsletter footer
   const newsletterFooter = `
 ════════════════
-*VORTEX XMD MOVIE SEARCH*
+*ULTRAXAS XMD MOVIE SEARCH*
 ════════════════
 ${movieData?.imdbID ? `📌 *IMDb Trailer:* https://www.imdb.com/title/${movieData.imdbID}/` : ''}
 ${trailerData?.url ? `📌 *YouTube Trailer:* ${trailerData.url}` : ''}
@@ -94,7 +94,7 @@ ${newsletterFooter}
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
           newsletterJid: "120363418485111392@newsletter",
-          newsletterName: "VORTEX XMD",
+          newsletterName: "ULTRAXAS XMD",
           serverMessageId: Math.floor(100000 + Math.random() * 900000),
         },
         externalAdReply: {
@@ -121,7 +121,7 @@ ${newsletterFooter}
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
           newsletterJid: "120363418485111392@newsletter",
-          newsletterName: "VORTEX XMD",
+          newsletterName: "ULTRAXAS XMD",
           serverMessageId: Math.floor(100000 + Math.random() * 900000),
         },
         externalAdReply: {
@@ -159,7 +159,7 @@ ${newsletterFooter}
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
           newsletterJid: "120363418485111392@newsletter",
-          newsletterName: "VORTEX XMD",
+          newsletterName: "ULTRAXAS XMD",
           serverMessageId: Math.floor(100000 + Math.random() * 900000),
         }
       }
@@ -176,7 +176,7 @@ ${newsletterFooter}
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
           newsletterJid: "120363418485111392@newsletter",
-          newsletterName: "VORTEX XMD",
+          newsletterName: "ULTRAXAS XMD",
           serverMessageId: Math.floor(100000 + Math.random() * 900000),
         }
       }

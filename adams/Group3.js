@@ -1,10 +1,10 @@
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 const fs = require("fs-extra");
-const { createContext } = require("../HansTz/helper");
+const { createContext } = require("../Ibrahim/helper");
 
 // Enhanced branding constants
 const BOT_BRANDING = {
-  NAME: "VORTEX XMD",
+  NAME: "ULTRAXAS XMD",
   TAGLINE: "Next-Gen WhatsApp Automation",
   AUTHOR: "Ultraxas md",
   EMOJI: {
@@ -21,9 +21,9 @@ const BOT_BRANDING = {
 
 // Special contact mapping
 const SPECIAL_CONTACTS = {
-  "254727716045": "Sir HansTz",
-  "254106727593": "Sir HansTz", 
-  "254710772666": "Sir HansTz"
+  "254727716045": "Sir Ibrahim Adams",
+  "254106727593": "Sir Ibrahim Adams", 
+  "254710772666": "Sir Ibrahim Adams"
 };
 
 // Utility function to clean group names for filenames

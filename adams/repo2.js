@@ -1,8 +1,8 @@
 const moment = require("moment-timezone");
-const { adams } = require("../HansTz/adams");
+const { adams } = require(__dirname + "/../Ibrahim/adams");
 const axios = require("axios");
 
-const repository = "Hans-255/Vortex-Xmd-Bot";
+const repository = "xason0/ULTRAXAS-XMD";
 const imageUrl = "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg;
 
 const githubRawBaseUrl =
@@ -42,10 +42,10 @@ commands.forEach((command) => {
     const currentTime = moment().tz("Africa/Nairobi").format("DD/MM/YYYY HH:mm:ss");
 
     const infoMessage = `╭━===========================
-┃  📌 VORTEX XMD REPO INFO 📌
+┃  📌 ULTRAXAS XMD REPO INFO 📌
 ┃ ⭐ Total Stars: ${formatNumber(stars)}
 ┃ 🍴 Total Forks: ${formatNumber(forks)}
-┃ 👤 Owner: Sir HansTz
+┃ 👤 Owner: Sir Ibrahim Adams
 ┃ 🕰 Updated: ${currentTime}
 ╰━===========================
 
@@ -55,7 +55,7 @@ commands.forEach((command) => {
 3️⃣ Ping Bot 📡
 4️⃣ Repo Alive Audio 🔊
 
-> Sir HansTz
+> Sir Ibrahim Adams
 `;
 
     try {
@@ -66,11 +66,11 @@ commands.forEach((command) => {
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
             newsletterJid: "120363418485111392@newsletter",
-            newsletterName: "VORTEX XMD",
+            newsletterName: "ULTRAXAS XMD",
             serverMessageId: Math.floor(100000 + Math.random() * 900000),
           },
           externalAdReply: {
-            title: "🚀 Explore VORTEX XMD Updates!",
+            title: "🚀 Explore ULTRAXAS XMD Updates!",
             body: "Reply this message with 1 to get repo link.",
             thumbnailUrl: imageUrl,
             mediaType: 1,
@@ -114,7 +114,7 @@ commands.forEach((command) => {
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                   newsletterJid: "120363418485111392@newsletter",
-                  newsletterName: "VORTEX XMD",
+                  newsletterName: "ULTRAXAS XMD",
                   serverMessageId: Math.floor(100000 + Math.random() * 900000),
                 },
                 externalAdReply: {

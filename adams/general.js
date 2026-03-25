@@ -1,5 +1,5 @@
 
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 const conf = require("../config");
 
 adams({ nomCom: "owner", categorie: "General", reaction: "🚘" }, async (dest, zk, commandeOptions) => {
@@ -25,7 +25,7 @@ adams({ nomCom: "dev", categorie: "General", reaction: "🚘" }, async (dest, zk
     const { ms, mybotpic } = commandeOptions;
 
     const devs = [
-      { nom: "HansTz", number: "255753668403" }
+      { nom: "Ibrahim", number: "254710772666" }
     ];
 
     let message = "WELCOME TO Ultraxas md HELP CENTER! CONTACT THE DEVELOPER:\n\n";
@@ -68,7 +68,7 @@ SUPPORT LINKS:
 ☉ Group: https://chat.whatsapp.com/F5BXJci8EDS9AJ6sfKMXIS
 ☉ YouTube: https://www.youtube.com/@ibrahimaitech
 
-Created by HansTz
+Created by Ibrahim Adams
 `;
     
     repondre(supportMessage);

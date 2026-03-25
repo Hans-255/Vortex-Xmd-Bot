@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 
 // Constants
 const BOT_START_TIME = Date.now();

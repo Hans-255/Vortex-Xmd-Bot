@@ -1,7 +1,7 @@
 const JavaScriptObfuscator = require("javascript-obfuscator");
 const {
   adams
-} = require("../HansTz/adams");
+} = require("../Ibrahim/adams");
 adams({
   'nomCom': "obt",
   'categorie': 'General'

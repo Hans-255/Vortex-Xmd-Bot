@@ -1,4 +1,4 @@
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 const fancy = require("../adams/stylish");
 
 adams({ nomCom: "fancy", categorie: "Fun", reaction: "〽️" }, async (dest, zk, commandeOptions) => {
@@ -8,7 +8,7 @@ adams({ nomCom: "fancy", categorie: "Fun", reaction: "〽️" }, async (dest, zk
 
     try {
         if (id === undefined || text === undefined) {
-            return await repondre(`\nExemple : ${prefixe}fancy 10 Ultraxas md\n` + String.fromCharCode(8206).repeat(4001) + fancy.list('VORTEX XMD', fancy));
+            return await repondre(`\nExemple : ${prefixe}fancy 10 Ultraxas md\n` + String.fromCharCode(8206).repeat(4001) + fancy.list('ULTRAXAS XMD', fancy));
         }
 
         const selectedStyle = fancy[parseInt(id) - 1];

@@ -1,6 +1,6 @@
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 const { default :axios } = require("axios");
-const { mediafireDl } = require("../HansTz/Function");
+const { mediafireDl } = require("../Ibrahim/Function");
 
 adams({
   nomCom: "fetch",

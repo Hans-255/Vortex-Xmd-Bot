@@ -1,4 +1,4 @@
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 const axios = require("axios");
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 const fs = require('fs-extra');
@@ -33,7 +33,7 @@ async function fetchAIResponse(url, query) {
             timeout: 15000,
             headers: {
                 'Accept': 'application/json',
-                'User-Agent': 'VORTEX XMD-Bot'
+                'User-Agent': 'ULTRAXAS XMD-Bot'
             }
         });
         
@@ -271,7 +271,7 @@ adams({
     const { repondre } = commandOptions;
     const prefix = config.PREFIX || "!";
 
-    let helpText = "🤖 *VORTEX XMD AI Commands*\n\n";
+    let helpText = "🤖 *ULTRAXAS XMD AI Commands*\n\n";
     
     // Text AI commands
     helpText += "*Text AI:*\n";

@@ -1,6 +1,6 @@
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 const conf = require(__dirname + "/../config");
-const BOT_NAME = "VORTEX XMD";
+const BOT_NAME = "ULTRAXAS XMD";
 const BOT_TAGLINE = "Next-Gen WhatsApp Automation";
 const EMOJI_THEME = {
   success: "⚡",

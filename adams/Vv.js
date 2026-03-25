@@ -1,6 +1,6 @@
-const { adams } = require("../HansTz/adams');
+const { adams } = require('../Ibrahim/adams');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
-const { createContext } = require("../HansTz/helper');
+const { createContext } = require('../Ibrahim/helper');
 
 // Define bot JID
 const botJid = `${adams.user?.id.split(':')[0]}@s.whatsapp.net`;

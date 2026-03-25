@@ -1,4 +1,4 @@
-const { adams } = require("../HansTz/adams');
+const { adams } = require('../Ibrahim/adams');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 const fs = require('fs-extra');
 const path = require('path');
@@ -31,7 +31,7 @@ adams({
 
     const imageMsg = quotedMsg?.imageMessage || ms.message?.imageMessage;
     let packName = arg.join(" ") || "Bwm xmd";
-    let authorName = "By HansTz";
+    let authorName = "By Ibrahim Adams";
 
     try {
         const stream = await downloadContentFromMessage(imageMsg, 'image');

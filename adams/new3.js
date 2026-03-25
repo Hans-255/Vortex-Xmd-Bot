@@ -1,4 +1,4 @@
-const { adams } = require("../HansTz/adams");
+const { adams } = require("../Ibrahim/adams");
 const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
 const fs = require("fs-extra");
 const path = require("path");

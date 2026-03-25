@@ -1,4 +1,4 @@
-const { adams } = require("../HansTz/adams');
+const { adams } = require('../Ibrahim/adams');
 
 // Set a riddle list with questions and answers
 const devinettes = [
