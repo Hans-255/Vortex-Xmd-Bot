@@ -1,6 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const { writeFile } = require('fs/promises')
 
 // Commande waifu
