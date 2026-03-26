@@ -152,7 +152,7 @@ adams(
                         forwardedNewsletterMessageInfo: {
                             newsletterJid: '120363421513037430@newsletter',
                             newsletterName: "VORTEX md",
-                            serverMessageId: -1 * 900000),
+                            serverMessageId: -1,
                         },
                     },
                 });
