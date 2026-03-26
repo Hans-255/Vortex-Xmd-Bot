@@ -380,7 +380,7 @@ adams({
                     thumbnailUrl: "' + getRandomImage() + '",
                     sourceUrl: "https://github.com/Hans-255/Vortex-Xmd-Bot",
                     renderLargerThumbnail: false,
-                    showAdAttribution: true,
+                    showAdAttribution: false,
                  }
             }
         }, { quoted: ms });
@@ -625,7 +625,7 @@ adams({
                     thumbnailUrl: "' + getRandomImage() + '",
                     sourceUrl: "https://github.com/Hans-255/Vortex-Xmd-Bot",
                     renderLargerThumbnail: false,
-                    showAdAttribution: true,
+                    showAdAttribution: false,
                 }
             }
         }, { quoted: ms });
@@ -682,7 +682,7 @@ adams({
                     thumbnailUrl: qrUrl,
                     sourceUrl: "https://github.com/Hans-255/Vortex-Xmd-Bot",
                     renderLargerThumbnail: false,
-                    showAdAttribution: true,
+                    showAdAttribution: false,
                 }
             }
         }, { quoted: ms });
