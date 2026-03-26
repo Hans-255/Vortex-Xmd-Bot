@@ -11,7 +11,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -42,7 +42,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -73,7 +73,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -104,7 +104,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -136,7 +136,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -167,7 +167,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -199,7 +199,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -231,7 +231,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -262,7 +262,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -294,7 +294,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -325,7 +325,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -356,7 +356,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -388,7 +388,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -420,7 +420,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -452,7 +452,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -484,7 +484,7 @@ adams({
 
   try {
     // Caption for the screenshot
-    const cap = `*Screenshot by BWM_XMD*`;
+    const cap = `*Screenshot by vortex_xmd*`;
 
     // Check if a URL is provided
     if (!arg[0]) {
@@ -732,7 +732,7 @@ adams({
     const imageUrl = `https://api.popcat.xyz/lulcat?text=${text}`;
     message.sendMessage(user, {
       'image': { 'url': imageUrl },
-      'caption': "*powered by BWM_XMD*"
+      'caption': "*powered by vortex_xmd*"
     }, { 'quoted': ms });
   } catch (error) {
     console.error("Error:", error.message || "An error occurred");
@@ -755,7 +755,7 @@ adams({
     const imageUrl = `https://api.popcat.xyz/sadcat?text=${text}`;
     message.sendMessage(user, {
       'image': { 'url': imageUrl },
-      'caption': "*powered by BWM_XMD*"
+      'caption': "*powered by vortex_xmd*"
     }, { 'quoted': ms });
   } catch (error) {
     console.error("Error:", error.message || "An error occurred");
@@ -778,7 +778,7 @@ adams({
     const imageUrl = `https://api.popcat.xyz/nokia?image=${text}`;
     message.sendMessage(user, {
       'image': { 'url': imageUrl },
-      'caption': "*powered by BWM_XMD*"
+      'caption': "*powered by vortex_xmd*"
     }, { 'quoted': ms });
   } catch (error) {
     console.error("Error:", error.message || "An error occurred");
@@ -801,7 +801,7 @@ adams({
     const imageUrl = `https://api.popcat.xyz/unforgivable?text=${text}`;
     message.sendMessage(user, {
       'image': { 'url': imageUrl },
-      'caption': "*powered by BWM_XMD*"
+      'caption': "*powered by vortex_xmd*"
     }, { 'quoted': ms });
   } catch (error) {
     console.error("Error:", error.message || "An error occurred");
@@ -824,7 +824,7 @@ adams({
     const imageUrl = `https://api.popcat.xyz/pooh?text1=&text2=${text}`;
     message.sendMessage(user, {
       'image': { 'url': imageUrl },
-      'caption': "*powered by BWM_XMD*"
+      'caption': "*powered by vortex_xmd*"
     }, { 'quoted': ms });
   } catch (error) {
     console.error("Error:", error.message || "An error occurred");
@@ -847,7 +847,7 @@ adams({
     const imageUrl = `https://api.popcat.xyz/oogway?text=${text}`;
     message.sendMessage(user, {
       'image': { 'url': imageUrl },
-      'caption': "*powered by BWM_XMD*"
+      'caption': "*powered by vortex_xmd*"
     }, { 'quoted': ms });
   } catch (error) {
     console.error("Error:", error.message || "An error occurred");
@@ -870,7 +870,7 @@ adams({
     const imageUrl = `https://api.popcat.xyz/biden?text=${text}`;
     message.sendMessage(user, {
       'image': { 'url': imageUrl },
-      'caption': "*powered by BWM_XMD*"
+      'caption': "*powered by vortex_xmd*"
     }, { 'quoted': ms });
   } catch (error) {
     console.error("Error:", error.message || "An error occurred");
