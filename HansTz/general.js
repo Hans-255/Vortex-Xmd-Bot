@@ -9,7 +9,7 @@ adams({ nomCom: "owner", categorie: "General", reaction: "🚘" }, async (dest, 
         'BEGIN:VCARD\n' +
         'VERSION:3.0\n' +
         'FN:' + conf.OWNER_NAME + '\n' +
-        'ORG:BWM-XMD;\n' +
+        'ORG:VORTEX XMD;\n' +
         'TEL;type=CELL;type=VOICE;waid=' + conf.NUMERO_OWNER + ':+' + conf.NUMERO_OWNER + '\n' +
         'END:VCARD';
     
@@ -61,7 +61,7 @@ adams({ nomCom: "support", categorie: "General" }, async (dest, zk, commandeOpti
     const { ms, repondre, auteurMessage } = commandeOptions; 
     
     const supportMessage = `
-THANK YOU FOR CHOOSING BWM-XMD
+THANK YOU FOR CHOOSING VORTEX XMD
 
 SUPPORT LINKS:
 ☉ Channel: https://whatsapp.com/channel/0029Vb7JRfvCRs1gTmsCB812
@@ -73,6 +73,6 @@ Created by HansTz
     
     repondre(supportMessage);
     await zk.sendMessage(auteurMessage, {
-        text: `THANK YOU FOR CHOOSING BWM-XMD, MAKE SURE YOU FOLLOW THESE LINKS.`
+        text: `THANK YOU FOR CHOOSING VORTEX XMD, MAKE SURE YOU FOLLOW THESE LINKS.`
     }, { quoted: ms });
 });
