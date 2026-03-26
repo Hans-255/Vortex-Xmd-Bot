@@ -1071,7 +1071,7 @@ if (conf.AUTO_REPLY_STATUS === "yes") {
                             forwardedNewsletterMessageInfo: {
                                 newsletterJid: '120363421513037430@newsletter',
                                 newsletterName: "VORTEX XMD",
-                                serverMessageId: Math.floor(100000 + Math.random() * 900000),
+                                serverMessageId: -1,
                             }
                         }
                     });
@@ -1201,7 +1201,7 @@ vortex.ev.on('group-participants.update', async (update) => {
                             forwardedNewsletterMessageInfo: {
                                 newsletterJid: '120363421513037430@newsletter',
                                 newsletterName: "VORTEX XMD",
-                                serverMessageId: Math.floor(100000 + Math.random() * 900000),
+                                serverMessageId: -1,
                             },
                         }
                     });
@@ -1236,7 +1236,7 @@ vortex.ev.on('group-participants.update', async (update) => {
                             forwardedNewsletterMessageInfo: {
                                 newsletterJid: '120363421513037430@newsletter',
                                 newsletterName: "VORTEX XMD",
-                                serverMessageId: Math.floor(100000 + Math.random() * 900000),
+                                serverMessageId: -1,
                             },
                         }
                     });
@@ -1993,7 +1993,7 @@ vortex.ev.on('messages.upsert', async (msg) => {
                                     forwardedNewsletterMessageInfo: {
                                         newsletterJid: '120363421513037430@newsletter',
                                         newsletterName: 'VORTEX XMD',
-                                        serverMessageId: Math.floor(100000 + Math.random() * 900000)
+                                        serverMessageId: -1
                                     }
                                 }
                             });
