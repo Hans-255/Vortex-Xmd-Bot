@@ -20,7 +20,7 @@ const makeContext = () => ({
     forwardedNewsletterMessageInfo: {
         newsletterJid: NEWSLETTER_JID,
         newsletterName: "VORTEX XMD",
-        serverMessageId: -1 * 900000)
+        serverMessageId: -1
     },
     externalAdReply: {
         title: "VORTEX XMD",
