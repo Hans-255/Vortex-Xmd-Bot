@@ -44,7 +44,7 @@ adams(
           forwardedNewsletterMessageInfo: {
             newsletterJid: '120363421513037430@newsletter',
             newsletterName: 'VORTEX XMD',
-            serverMessageId: Math.floor(100000 + Math.random() * 900000),
+            serverMessageId: -1 * 900000),
           },
         },
       }, { quoted: commandeOptions?.ms });
