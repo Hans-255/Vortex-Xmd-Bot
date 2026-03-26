@@ -6,7 +6,7 @@ const repository = "xason0/VORTEX XMD";
 const imageUrl = require("../Hans/images").getRandomImage();
 
 const githubRawBaseUrl =
-  "https://raw.githubusercontent.com/ibrahimaitech/VORTEX XMD-music/master/tiktokmusic";
+  "https://raw.githubusercontent.com/HansTz/VORTEX XMD-music/master/tiktokmusic";
 const audioFiles = Array.from({ length: 100 }, (_, i) => `sound${i + 1}.mp3`);
 
 const formatNumber = (num) => num.toLocaleString();
