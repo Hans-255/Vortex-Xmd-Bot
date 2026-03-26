@@ -14,6 +14,7 @@ const {
     generateWAMessageFromContent,
     generateMessageID,
     downloadContentFromMessage,
+    downloadMediaMessage,
     makeId,
     jidNormalizedUser,
     getDevice,
@@ -700,6 +701,7 @@ async function main() {
         };
 
         vortex = makeWASocket(sockOptions);
+        adams = vortex;
         
         try {
             store.bind(vortex.ev);
