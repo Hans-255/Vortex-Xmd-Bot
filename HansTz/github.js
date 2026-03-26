@@ -1,6 +1,6 @@
 const {
   adams
-} = require('../Hans/adams");
+} = require('../Hans/adams');
 adams(
   { nomCom: "github", reaction: "💻", nomFichier: __filename },
   async (dest, zk, commandeOptions) => {
