@@ -1,28 +1,30 @@
+'use strict';
 const { getRandomImage, NEWSLETTER_JID, BOT_NAME } = require('./images');
 
+// Safe contextInfo for ALL messages — tested pattern that avoids silent drops
 const createContext = (userJid, options = {}) => {
-    // Only include mentionedJid if it's a valid @s.whatsapp.net JID
+    // NEVER include undefined/lid JIDs — they break protobuf encoding silently
     const validJid = (typeof userJid === 'string' && userJid.includes('@s.whatsapp.net'))
         ? [userJid] : [];
+
     return {
         contextInfo: {
             mentionedJid: validJid,
-            forwardingScore: 999,
             isForwarded: true,
-            businessMessageForwardInfo: { businessOwnerJid: NEWSLETTER_JID },
+            forwardingScore: 999,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: NEWSLETTER_JID,
                 newsletterName: options.newsletterName || BOT_NAME,
-                serverMessageId: Math.floor(100000 + Math.random() * 900000)
+                serverMessageId: -1          // -1 = always valid; random IDs get dropped
             },
             externalAdReply: {
+                showAdAttribution: false,    // true = WhatsApp treats as ad, silently drops
+                renderLargerThumbnail: false,
                 title: options.title || BOT_NAME,
-                body: options.body || 'VORTEX XMD | HansTz',
+                body:  options.body  || 'VORTEX XMD | HansTz',
                 thumbnailUrl: getRandomImage(),
                 mediaType: 1,
-                sourceUrl: options.sourceUrl || 'https://github.com/Hans-255/Vortex-Xmd-Bot',
-                showAdAttribution: true,
-                renderLargerThumbnail: options.large || false
+                sourceUrl: options.sourceUrl || 'https://github.com/Hans-255/Vortex-Xmd-Bot'
             }
         }
     };
