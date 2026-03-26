@@ -230,7 +230,7 @@ adams({
     const response = await axios.get("https://nekos.life/api/v2/fact");
     const data = response.data;
     const factMessage = `
-┌───── *BWM-XMD-FACT* ──────╮                     
+┌───── *VORTEX XMD-FACT* ──────╮                     
 │
 │   ❏ ${data.fact} 
 │
