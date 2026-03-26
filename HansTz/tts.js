@@ -1,58 +1,57 @@
+'use strict';
 const { adams } = require('../Hans/adams');
-const axios = require("axios"); // Using axios for API requests
+const { getRandomImage } = require('../Hans/images');
+const axios = require('axios');
 
-// Function to get TTS audio URL
-async function getTTS(text, lang) {
-  try {
-    const response = await axios.get(`https://api.maskser.me/api/soundoftext`, {
-      params: { text, lang },
-    });
+const NEWSLETTER_JID = '120363421513037430@newsletter';
 
-    if (response.data && response.data.result) {
-      return response.data.result; // API returns the direct audio URL
+const makeCtx = () => ({
+    forwardingScore: 999,
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+        newsletterJid: NEWSLETTER_JID,
+        newsletterName: 'VORTEX XMD',
+        serverMessageId: Math.floor(100000 + Math.random() * 900000)
+    },
+    externalAdReply: {
+        title: 'VORTEX XMD TTS',
+        body: 'Text to Speech | HansTz Bot',
+        thumbnailUrl: getRandomImage(),
+        mediaType: 1,
+        sourceUrl: 'https://github.com/Hans-255/Vortex-Xmd-Bot',
+        showAdAttribution: true
     }
-    return null;
-  } catch (error) {
-    console.error("TTS API Error:", error);
-    return null;
-  }
+});
+
+async function getTTS(text, lang) {
+    try {
+        const res = await axios.get('https://api.maskser.me/api/soundoftext', { params: { text, lang } });
+        return (res.data && res.data.result) ? res.data.result : null;
+    } catch (e) {
+        return null;
+    }
 }
 
-// Define TTS commands
 const ttsCommands = [
-  { name: "dit", lang: "fr", response: "👄" },
-  { name: "itta", lang: "ja", response: "👄" },
-  { name: "say", lang: "en-US", response: "👄" }, // Using en-US for better accuracy
+    { name: 'dit',  lang: 'fr',    label: 'French' },
+    { name: 'itta', lang: 'ja',    label: 'Japanese' },
+    { name: 'say',  lang: 'en-US', label: 'English' },
 ];
 
-// Generate commands dynamically
-ttsCommands.forEach(({ name, lang, response }) => {
-  adams(
-    {
-      nomCom: name,
-      categorie: "tts",
-      reaction: response,
-    },
-    async (dest, zk, commandeOptions) => {
-      const { ms, arg, repondre } = commandeOptions;
-      if (!arg[0]) {
-        repondre("Insert a word");
-        return;
-      }
-      const mots = arg.join(" ");
+ttsCommands.forEach(({ name, lang, label }) => {
+    adams({ nomCom: name, categorie: 'TTS', reaction: '🗣️' }, async (dest, zk, opts) => {
+        const { ms, arg, repondre } = opts;
+        if (!arg || !arg[0]) return repondre(`❌ Usage: .${name} [text]\nExample: .${name} Hello World`);
 
-      const audioUrl = await getTTS(mots, lang);
-      if (!audioUrl) {
-        repondre("TTS conversion failed. Try again later.");
-        return;
-      }
+        const text = arg.join(' ');
+        const audioUrl = await getTTS(text, lang);
+        if (!audioUrl) return repondre('❌ TTS failed. Please try again later.');
 
-      console.log(audioUrl);
-      zk.sendMessage(
-        dest,
-        { audio: { url: audioUrl }, mimetype: "audio/mpeg" }, // API provides MP3
-        { quoted: ms, ptt: true }
-      );
-    }
-  );
+        await zk.sendMessage(dest, {
+            audio: { url: audioUrl },
+            mimetype: 'audio/mpeg',
+            ptt: true,
+            contextInfo: makeCtx()
+        }, { quoted: ms });
+    });
 });
