@@ -766,34 +766,38 @@ vortex.ev.on("messages.upsert", async ({ messages }) => {
         if (key.remoteJid === 'status@broadcast') return;
 
         const sender = key.participant || key.remoteJid;
-        if (sender === botJid || sender === botOwnerJid || key.fromMe) return;
+        const isOwnMsg = key.fromMe || sender === botJid;
 
-        // Store message with timestamp
-        if (!ibraah.chats[key.remoteJid]) ibraah.chats[key.remoteJid] = [];
-        ibraah.chats[key.remoteJid].push({
-            ...ms,
-            timestamp: Date.now()
-        });
-
-        // Cleanup old messages (keep only last 100 messages per chat)
-        if (ibraah.chats[key.remoteJid].length > 100) {
-            ibraah.chats[key.remoteJid].shift();
+        // Store message with timestamp (only store others' messages, not own)
+        if (!isOwnMsg) {
+            if (!ibraah.chats[key.remoteJid]) ibraah.chats[key.remoteJid] = [];
+            ibraah.chats[key.remoteJid].push({
+                ...ms,
+                timestamp: Date.now()
+            });
+            // Cleanup old messages (keep only last 100 messages per chat)
+            if (ibraah.chats[key.remoteJid].length > 100) {
+                ibraah.chats[key.remoteJid].shift();
+            }
         }
 
-        // Check for deletion
+        // Check for deletion (runs for ALL messages including own deletions)
         if (ms.message?.protocolMessage?.type === 0) {
             const deletedId = ms.message.protocolMessage.key.id;
-            const deletedMsg = ibraah.chats[key.remoteJid].find(m => m.key.id === deletedId);
+            const chatJid = ms.message.protocolMessage.key.remoteJid || key.remoteJid;
+            const chatStore = ibraah.chats[chatJid] || ibraah.chats[key.remoteJid] || [];
+            const deletedMsg = chatStore.find(m => m.key.id === deletedId);
             if (!deletedMsg?.message) return;
 
             const deleter = ms.key.participant || ms.key.remoteJid;
-            if (deleter === botJid || deleter === botOwnerJid) return;
 
             // Immediately handle the deleted message
-            await handleDeletedMessage(deletedMsg, key, deleter);
+            await handleDeletedMessage(deletedMsg, { remoteJid: chatJid }, deleter);
 
             // Remove the deleted message from ibraah
-            ibraah.chats[key.remoteJid] = ibraah.chats[key.remoteJid].filter(m => m.key.id !== deletedId);
+            if (ibraah.chats[chatJid]) {
+                ibraah.chats[chatJid] = ibraah.chats[chatJid].filter(m => m.key.id !== deletedId);
+            }
         }
     } catch (error) {
         logger.error('Anti-delete system error:', error);
@@ -857,8 +861,19 @@ if (conf.AUTO_BIO === "yes") {
 if (conf.ANTICALL === 'yes') {
     vortex.ev.on("call", async (callData) => {
         try {
-            await vortex.rejectCall(callData[0].id, callData[0].from);
-            console.log('Call blocked from:', callData[0].from.slice(0, 6) + '...');
+            const caller = callData[0].from;
+            await vortex.rejectCall(callData[0].id, caller);
+            console.log('Call blocked from:', caller.slice(0, 6) + '...');
+            // Send warning message to caller
+            const warningMsg = `📵 *DON'T CALL THIS NUMBER!*
+
+🤖 This number is connected to *VORTEX XMD* WhatsApp bot
+👤 Owner: *${conf.OWNER_NAME || 'HansTz'}*
+🚫 Your call has been automatically rejected
+
+> _If you need assistance, send a text message instead_
+> _Powered by VORTEX XMD | HansTz_`;
+            await vortex.sendMessage(caller, { text: warningMsg });
         } catch (error) {
             console.error('Call block failed:', error.message);
         }
