@@ -1,4 +1,4 @@
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const fs = require("fs-extra");
 const { createContext } = require('../Hans/helper");
 
