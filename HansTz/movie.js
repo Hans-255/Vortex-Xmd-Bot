@@ -5,9 +5,9 @@ const ytSearch = require("yt-search");
 
 // Random images for newsletter
 const randomImages = [
-  "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg",
-  "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg",
-  "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg"
+  "https://res.raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg",
+  "https://res.raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg",
+  "https://res.raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg"
 ];
 
 adams({
@@ -46,7 +46,7 @@ adams({
       
       // Get download link from your API
       const apiResponse = await axios.get(
-        `https://api.bwmxmd.online/api/download/ytmp4?apikey=ibraah-tech&url=${encodeURIComponent(trailerData.url)}`
+        `https://api.github.com/Hans-255/Vortex-Xmd-Bot/api/download/ytmp4?apikey=vortex-tech&url=${encodeURIComponent(trailerData.url)}`
       );
       
       if (apiResponse.data?.success) {
