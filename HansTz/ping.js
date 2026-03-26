@@ -20,7 +20,7 @@ const makeContext = () => ({
     forwardedNewsletterMessageInfo: {
         newsletterJid: NEWSLETTER_JID,
         newsletterName: "VORTEX XMD",
-        serverMessageId: Math.floor(100000 + Math.random() * 900000)
+        serverMessageId: -1 * 900000)
     },
     externalAdReply: {
         title: "VORTEX XMD",
@@ -28,7 +28,7 @@ const makeContext = () => ({
         thumbnailUrl: getRandomImage(),
         mediaType: 1,
         sourceUrl: 'https://github.com/Hans-255/Vortex-Xmd-Bot',
-        showAdAttribution: true
+        showAdAttribution: false
     }
 });
 
