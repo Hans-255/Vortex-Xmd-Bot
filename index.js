@@ -629,7 +629,7 @@ const handleDeletedMessage = async (deletedMsg, key, deleter) => {
     const context = createContext(deleter, {
         title: "Anti-Delete Protection",
         body: "Deleted message detected",
-        thumbnail: "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg"
+        thumbnail: "https://res.raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg"
     });
 
     const chatInfo = key.remoteJid.includes('@g.us') ? 
@@ -1008,7 +1008,7 @@ if (conf.AUTO_REPLY_STATUS === "yes") {
                     lastNotified.set(statusSender, now);
                     
                     await vortex.sendMessage(statusSender, {
-                        text: `${conf.REPLY_STATUS_TEXT || "*ʏᴏᴜʀ sᴛᴀᴛᴜs ʜᴀᴠᴇ ʙᴇᴇɴ ᴠɪᴇᴡᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ✅*"}\n\n📌 For more info visit: *bwmxmd.online*\n\n> ǫᴜᴀɴᴛᴜᴍ ᴠɪᴇᴡᴇʀ`,
+                        text: `${conf.REPLY_STATUS_TEXT || "*ʏᴏᴜʀ sᴛᴀᴛᴜs ʜᴀᴠᴇ ʙᴇᴇɴ ᴠɪᴇᴡᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ ✅*"}\n\n📌 For more info visit: *github.com/Hans-255/Vortex-Xmd-Bot*\n\n> ǫᴜᴀɴᴛᴜᴍ ᴠɪᴇᴡᴇʀ`,
                         contextInfo: {
                             quotedMessage: statusMessage.message,
                             stanzaId: statusMessage.key.id,
@@ -1035,8 +1035,8 @@ if (conf.AUTO_REPLY_STATUS === "yes") {
 }
 
 // ==================== WELCOME/GOODBYE SYSTEM ====================
-const welcomeImage = 'https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg';
-const goodbyeImage = 'https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg';
+const welcomeImage = 'https://res.raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg';
+const goodbyeImage = 'https://res.raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg';
 
 // Cache for group names and profile photos
 const groupCache = new Map();
@@ -1129,13 +1129,13 @@ vortex.ev.on('group-participants.update', async (update) => {
                     const profilePhoto = await getProfilePhoto(participant, welcomeImage);
                     
                     const welcomeMessages = [
-                        `🌟 *W E L C O M E* 🌟\n\n🎉 Welcome to *${groupName}*\n\n✨ We're thrilled to have you join our amazing community! Feel free to introduce yourself and explore what we have to offer.\n\n🤝 Don't hesitate to jump into conversations and make new connections.\n\n📌 *For more info visit:* bwmxmd.online\n\n🚀 _Enjoy your stay with us!_`,
+                        `🌟 *W E L C O M E* 🌟\n\n🎉 Welcome to *${groupName}*\n\n✨ We're thrilled to have you join our amazing community! Feel free to introduce yourself and explore what we have to offer.\n\n🤝 Don't hesitate to jump into conversations and make new connections.\n\n📌 *For more info visit:* github.com/Hans-255/Vortex-Xmd-Bot\n\n🚀 _Enjoy your stay with us!_`,
                         
-                        `✨ *N E W  M E M B E R* ✨\n\n🏠 You've just joined *${groupName}*\n\n💫 We're excited to have you here with us! This is a place where great minds meet and amazing conversations happen.\n\n🌈 Feel free to ask questions, share ideas, and participate actively.\n\n📌 *For more info visit:* bwmxmd.online\n\n🎯 _Let's make great memories together!_`,
+                        `✨ *N E W  M E M B E R* ✨\n\n🏠 You've just joined *${groupName}*\n\n💫 We're excited to have you here with us! This is a place where great minds meet and amazing conversations happen.\n\n🌈 Feel free to ask questions, share ideas, and participate actively.\n\n📌 *For more info visit:* github.com/Hans-255/Vortex-Xmd-Bot\n\n🎯 _Let's make great memories together!_`,
                         
-                        `🎉 *W A R M  W E L C O M E* 🎉\n\n🏆 Welcome to *${groupName}*\n\n🌟 We hope you'll find this group engaging, helpful, and full of positive vibes! Your presence adds value to our community.\n\n💡 Looking forward to your amazing contributions!\n\n📌 *For more info visit:* bwmxmd.online\n\n✅ _Welcome aboard!_`,
+                        `🎉 *W A R M  W E L C O M E* 🎉\n\n🏆 Welcome to *${groupName}*\n\n🌟 We hope you'll find this group engaging, helpful, and full of positive vibes! Your presence adds value to our community.\n\n💡 Looking forward to your amazing contributions!\n\n📌 *For more info visit:* github.com/Hans-255/Vortex-Xmd-Bot\n\n✅ _Welcome aboard!_`,
                         
-                        `🚀 *H E L L O  T H E R E* 🚀\n\n🎪 Welcome to *${groupName}*\n\n🎨 We're pleased to have you as part of our wonderful community. This is your space to learn, share, and grow with like-minded people.\n\n🌍 Feel free to explore and make yourself at home!\n\n📌 *For more info visit:* bwmxmd.online\n\n🎭 _Great to have you here!_`
+                        `🚀 *H E L L O  T H E R E* 🚀\n\n🎪 Welcome to *${groupName}*\n\n🎨 We're pleased to have you as part of our wonderful community. This is your space to learn, share, and grow with like-minded people.\n\n🌍 Feel free to explore and make yourself at home!\n\n📌 *For more info visit:* github.com/Hans-255/Vortex-Xmd-Bot\n\n🎭 _Great to have you here!_`
                     ];
                     
                     const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
@@ -1164,13 +1164,13 @@ vortex.ev.on('group-participants.update', async (update) => {
                     const profilePhoto = await getProfilePhoto(participant, goodbyeImage);
                     
                     const farewellMessages = [
-                        `👋🏻 *F A R E W E L L* 👋🏻\n\n🌅 *${userName}* has left *${groupName}*\n\n🙏🏻 We appreciate the wonderful time you spent with us and all the great memories we shared together.\n\n✨ Thank you for being part of our community.\n\n🌟 Wishing you all the best on your journey ahead!\n\n📌 *For more info visit:* bwmxmd.online\n\n🚪 _You're always welcome back!_`,
+                        `👋🏻 *F A R E W E L L* 👋🏻\n\n🌅 *${userName}* has left *${groupName}*\n\n🙏🏻 We appreciate the wonderful time you spent with us and all the great memories we shared together.\n\n✨ Thank you for being part of our community.\n\n🌟 Wishing you all the best on your journey ahead!\n\n📌 *For more info visit:* github.com/Hans-255/Vortex-Xmd-Bot\n\n🚪 _You're always welcome back!_`,
                         
-                        `🌅 *G O O D B Y E* 🌅\n\n👋🏻 Farewell to *${userName}* from *${groupName}*\n\n💫 Thank you for your amazing contributions to our community. Your presence made a difference and we'll miss having you around.\n\n🎭 The memories we created together will always be cherished.\n\n🌈 You're always welcome back anytime!\n\n📌 *For more info visit:* bwmxmd.online\n\n🎯 _Take care and stay awesome!_`,
+                        `🌅 *G O O D B Y E* 🌅\n\n👋🏻 Farewell to *${userName}* from *${groupName}*\n\n💫 Thank you for your amazing contributions to our community. Your presence made a difference and we'll miss having you around.\n\n🎭 The memories we created together will always be cherished.\n\n🌈 You're always welcome back anytime!\n\n📌 *For more info visit:* github.com/Hans-255/Vortex-Xmd-Bot\n\n🎯 _Take care and stay awesome!_`,
                         
-                        `✨ *S E E  Y O U  L A T E R* ✨\n\n🙋🏻‍♂️ *${userName}* is no longer with us in *${groupName}*\n\n🌟 We're grateful for all the wonderful memories and meaningful interactions we shared together.\n\n🤝 Your contributions to our community were truly valuable.\n\n💫 Take care and stay in touch!\n\n📌 *For more info visit:* bwmxmd.online\n\n🎊 _Until we meet again!_`,
+                        `✨ *S E E  Y O U  L A T E R* ✨\n\n🙋🏻‍♂️ *${userName}* is no longer with us in *${groupName}*\n\n🌟 We're grateful for all the wonderful memories and meaningful interactions we shared together.\n\n🤝 Your contributions to our community were truly valuable.\n\n💫 Take care and stay in touch!\n\n📌 *For more info visit:* github.com/Hans-255/Vortex-Xmd-Bot\n\n🎊 _Until we meet again!_`,
                         
-                        `🙏🏻 *T H A N K  Y O U* 🙏🏻\n\n👋🏻 We bid farewell to *${userName}* from *${groupName}*\n\n🏆 It's been an absolute pleasure having you as part of our amazing community. Your positive energy and contributions made this place better.\n\n🌍 Wishing you success and happiness in all your endeavors!\n\n🎨 Keep being awesome wherever you go!\n\n📌 *For more info visit:* bwmxmd.online\n\n🚀 _Best wishes always!_`
+                        `🙏🏻 *T H A N K  Y O U* 🙏🏻\n\n👋🏻 We bid farewell to *${userName}* from *${groupName}*\n\n🏆 It's been an absolute pleasure having you as part of our amazing community. Your positive energy and contributions made this place better.\n\n🌍 Wishing you success and happiness in all your endeavors!\n\n🎨 Keep being awesome wherever you go!\n\n📌 *For more info visit:* github.com/Hans-255/Vortex-Xmd-Bot\n\n🚀 _Best wishes always!_`
                     ];
                     
                     const randomMessage = farewellMessages[Math.floor(Math.random() * farewellMessages.length)];
@@ -1917,12 +1917,26 @@ vortex.ev.on('messages.upsert', async (msg) => {
 ⚡ *Status:* Connected
 🔰 *Prefix:* [ ${conf.PREFIX} ]
 ☣️ *Mode:* ${md}
+🏠 *Owner:* ${conf.OWNER_NAME || 'HansTz'}
 ⏰ *Time:* ${new Date().toLocaleString('en-US', { timeZone: 'Africa/Dar_es_Salaam' })}
 
 > *Powered by VORTEX XMD*`;
 
                         try {
-                            await vortex.sendMessage(botSelf, { text: connectionMsg });
+                            const startImg = getRandomImage();
+                            await vortex.sendMessage(botSelf, {
+                                image: { url: startImg },
+                                caption: connectionMsg,
+                                contextInfo: {
+                                    forwardingScore: 999,
+                                    isForwarded: true,
+                                    forwardedNewsletterMessageInfo: {
+                                        newsletterJid: '120363421513037430@newsletter',
+                                        newsletterName: 'VORTEX XMD',
+                                        serverMessageId: Math.floor(100000 + Math.random() * 900000)
+                                    }
+                                }
+                            });
                         } catch (e) {
                             console.error('⚠️ Could not send startup message:', e.message);
                         }
