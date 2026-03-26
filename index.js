@@ -1,5 +1,24 @@
 global.conf = require('./config');
-const makeWASocket = require("@whiskeysockets/baileys").default
+const {
+    default: makeWASocket,
+    fetchLatestBaileysVersion,
+    useMultiFileAuthState,
+    makeCacheableSignalKeyStore,
+    makeInMemoryStore,
+    DisconnectReason,
+    jidDecode,
+    proto,
+    getContentType,
+    generateForwardMessageContent,
+    prepareWAMessageMedia,
+    generateWAMessageFromContent,
+    generateMessageID,
+    downloadContentFromMessage,
+    makeId,
+    jidNormalizedUser,
+    getDevice,
+    areJidsSameUser
+} = require("@whiskeysockets/baileys");
 const logger = require("@whiskeysockets/baileys/lib/Utils/logger").default.child({});
 const { createContext } = require('./Hans/helper');
 const pino = require("pino");
