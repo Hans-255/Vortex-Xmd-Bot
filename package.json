@@ -9,7 +9,7 @@
     "npm": "10.8.2"
   },
   "scripts": {
-    "start": "pm2 start index.js --deep-monitoring --attach --name vortex-xmd",
+    "start": "node_modules/.bin/pm2-runtime start ecosystem.config.js",
     "dev": "node index.js",
     "test": "node index.js",
     "c": "tsc",
