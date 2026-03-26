@@ -1,5 +1,5 @@
 
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const conf = require("../config");
 
 adams({ nomCom: "owner", categorie: "General", reaction: "🚘" }, async (dest, zk, commandeOptions) => {
@@ -66,7 +66,7 @@ THANK YOU FOR CHOOSING BWM-XMD
 SUPPORT LINKS:
 ☉ Channel: https://whatsapp.com/channel/0029Vb7JRfvCRs1gTmsCB812
 ☉ Group: https://chat.whatsapp.com/F5BXJci8EDS9AJ6sfKMXIS
-☉ YouTube: https://www.youtube.com/@ibrahimaitech
+☉ YouTube: https://github.com/Hans-255/Vortex-Xmd-Bot
 
 Created by HansTz
 `;
