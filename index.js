@@ -1,4 +1,5 @@
 global.conf = require('./config');
+global.isShuttingDown = false;
 const {
     default: makeWASocket,
     fetchLatestBaileysVersion,
@@ -283,15 +284,15 @@ class WorkerManager {
         // Graceful shutdown handlers
         process.on('SIGTERM', () => {
             console.log('📡 SIGTERM received, shutting down gracefully...');
-            if (vortex) vortex.end();
-            if (store) store.destroy();
+            global.isShuttingDown = true;
+            try { if (store) store.destroy(); } catch(e) {}
             process.exit(0);
         });
 
         process.on('SIGINT', () => {
             console.log('📡 SIGINT received, shutting down gracefully...');
-            if (vortex) vortex.end();
-            if (store) store.destroy();
+            global.isShuttingDown = true;
+            try { if (store) store.destroy(); } catch(e) {}
             process.exit(0);
         });
     }
@@ -2090,6 +2091,10 @@ vortex.ev.on('messages.upsert', async (msg) => {
     }
 
             if (connection === "close") {
+                if (global.isShuttingDown) {
+                    console.log('📡 Connection closed during shutdown, not reconnecting.');
+                    return;
+                }
                 const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
                 const errorMessage = lastDisconnect?.error?.message || '';
                 
@@ -2133,11 +2138,12 @@ vortex.ev.on('messages.upsert', async (msg) => {
         });
 
         const cleanup = () => {
+            global.isShuttingDown = true;
             if (store) {
-                store.destroy();
+                try { store.destroy(); } catch(e) {}
             }
             if (listenerManager) {
-                listenerManager.cleanupListeners();
+                try { listenerManager.cleanupListeners(); } catch(e) {}
             }
         };
 
