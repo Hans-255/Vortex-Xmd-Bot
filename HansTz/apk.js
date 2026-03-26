@@ -1,4 +1,4 @@
-const {adams} = require('../Hans/adams");
+const {adams} = require('../Hans/adams');
 const fs = require('fs-extra');
 const conf = require('../config');
 const { default: axios } = require("axios");
