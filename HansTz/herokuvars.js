@@ -131,8 +131,8 @@ adams(
 
                 const randomImage =
                     Math.random() < 0.5
-                        ? "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg"
-                        : "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg";
+                        ? "https://res.raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg"
+                        : "https://res.raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg";
 
                 const message = `🌟 *VORTEX XMD HYBRID SETTINGS* 🌟\n📌 Reply with a number to toggle a variable\n (Page ${
                     pageIndex + 1
@@ -225,11 +225,10 @@ adams(
                                 zk.ev.off("messages.upsert", replyHandler);
 
                                 await zk.sendMessage(chatId, {
-                                    text: `${updateMessage}\n\n💾 *Saved to:* ${hybridConfig.isHerokuAvailable ? 'Local + Heroku' : 'Local Storage'}\n🔄 *Bot is restarting...*\n🆔 *Session:* ${hybridConfig.getSessionId().slice(-8)}`,
+                                    text: `${updateMessage}\n\n💾 *Saved to:* ${hybridConfig.isHerokuAvailable ? 'Local + Heroku' : 'Local Storage'}\n🆔 *Session:* ${hybridConfig.getSessionId().slice(-8)}`,
                                 });
 
                                 // Restart bot with new settings
-                                await hybridConfig.restartBot();
                             } else {
                                 await zk.sendMessage(chatId, {
                                     text: `❌ *Failed to update ${configMapping[selectedKey]}*\n\n🔧 *Try using:* \`setvar ${selectedKey}=${newValue}\``,
@@ -304,12 +303,10 @@ adams({
                       `📝 *Variable:* ${varName}\n` +
                       `📊 *Value:* ${value}\n` +
                       `💾 *Saved to:* ${hybridConfig.isHerokuAvailable ? 'Local + Heroku' : 'Local Storage'}\n` +
-                      `🔄 *Bot is restarting...*\n` +
                       `🆔 *Session:* ${hybridConfig.getSessionId().slice(-8)}`
             });
             
             // Restart bot with new settings
-            await hybridConfig.restartBot();
         } else {
             await zk.sendMessage(chatId, {
                 text: `❌ *Failed to update ${varName}*\n\n🔧 *Please check the variable name and try again.*`
@@ -552,9 +549,8 @@ adams({
         
         if (success) {
             await zk.sendMessage(chatId, {
-                text: `✅ *${setting.name} is now ${action.toUpperCase()}*\n\n🔄 *Bot is restarting...*`
+                text: `✅ *${setting.name} is now ${action.toUpperCase()}*\n`
             });
-            await hybridConfig.restartBot();
         } else {
             await zk.sendMessage(chatId, {
                 text: `❌ *Failed to update ${setting.name}*`
@@ -631,9 +627,8 @@ presenceCommands.forEach(({ cmd, value, offValue, name }) => {
             
             if (success) {
                 await zk.sendMessage(chatId, {
-                    text: `✅ *${name} is now ${action.toUpperCase()}*\n\n🔄 *Bot is restarting...*`
+                    text: `✅ *${name} is now ${action.toUpperCase()}*\n`
                 });
-                await hybridConfig.restartBot();
             } else {
                 await zk.sendMessage(chatId, {
                     text: `❌ *Failed to update ${name}*`
@@ -716,9 +711,8 @@ autoFeatures.forEach(feature => {
             
             if (success) {
                 await zk.sendMessage(chatId, {
-                    text: `✅ *${setting.name} is now ${action.toUpperCase()}*\n\n🔄 *Bot is restarting...*`
+                    text: `✅ *${setting.name} is now ${action.toUpperCase()}*\n`
                 });
-                await hybridConfig.restartBot();
             } else {
                 await zk.sendMessage(chatId, {
                     text: `❌ *Failed to update ${setting.name}*`
@@ -743,16 +737,13 @@ adams({
   }
 
   try {
-    // Send restart request to local endpoint
-    const response = await fetch('http://localhost:' + (process.env.PORT || 3000) + '/restart');
     await zk.sendMessage(chatId, {
-      text: "✅ *Bot restart initiated!*\n\n🔄 *Please wait a moment while the bot restarts...*"
+      text: "🔄 *Bot restarting...*\n\nPlease wait a moment!"
     });
+    setTimeout(() => process.exit(1), 2000);
   } catch (error) {
     console.error("Error restarting bot:", error);
-    await zk.sendMessage(chatId, {
-      text: "⚠️ *Failed to restart bot!*\n\nError: " + error.message
-    });
+    process.exit(1);
   }
 });
 
@@ -767,16 +758,13 @@ adams({
   }
 
   try {
-    // Send restart request to local endpoint
-    const response = await fetch('http://localhost:' + (process.env.PORT || 3000) + '/restart');
     await zk.sendMessage(chatId, {
-      text: "✅ *Bot restart initiated!*\n\n🔄 *Please wait a moment while the bot restarts...*"
+      text: "🔄 *Bot restarting...*\n\nPlease wait a moment!"
     });
+    setTimeout(() => process.exit(1), 2000);
   } catch (error) {
     console.error("Error restarting bot:", error);
-    await zk.sendMessage(chatId, {
-      text: "⚠️ *Failed to restart bot!*\n\nError: " + error.message
-    });
+    process.exit(1);
   }
 });
 
