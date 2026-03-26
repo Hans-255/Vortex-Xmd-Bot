@@ -6,11 +6,11 @@ const { generateWAMessageFromContent, prepareWAMessageMedia } = pkg;
 // Available API endpoints
 const apiEndpoints = [
     "https://ultra-scanner.onrender.com"
-    //"https://bwm-xmd-scanner-2.onrender.com",
-   // "https://bwm-xmd-scanner-vv1.onrender.com",
-   // "https://bwm-xmd-scanner-vv2.onrender.com"
-   // "https://bwm-xmd-scanner-vvv1.onrender.com",
-  //  "https://bwm-xmd-scanner-vvv2.onrender.com"
+    //"https://VORTEX XMD-scanner-2.onrender.com",
+   // "https://VORTEX XMD-scanner-vv1.onrender.com",
+   // "https://VORTEX XMD-scanner-vv2.onrender.com"
+   // "https://VORTEX XMD-scanner-vvv1.onrender.com",
+  //  "https://VORTEX XMD-scanner-vvv2.onrender.com"
 ];
 
 // Unified Rent/Code Command
@@ -91,12 +91,12 @@ async function handleCodeRequest(dest, zk, commandeOptions, apiUrl) {
                 } 
                 else if (buttonId === 'visit_website') {
                     await zk.sendMessage(dest, {
-                        text: "🌐 *BWM XMD Website*\nbusiness.bwmxmd.online"
+                        text: "🌐 *VORTEX XMD Website*\ngithub.com/Hans-255/Vortex-Xmd-Bot"
                     }, { quoted: message });
                 }
                 else if (buttonId === 'get_help') {
                     await zk.sendMessage(dest, {
-                        text: "🆘 *Need help?*\nContact support:\nbwm-xmd-messenger.up.railway.app"
+                        text: "🆘 *Need help?*\nContact support:\nVORTEX XMD-messenger.up.railway.app"
                     }, { quoted: message });
                 }
             };
