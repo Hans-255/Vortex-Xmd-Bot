@@ -95,7 +95,7 @@ ${newsletterFooter}
         forwardedNewsletterMessageInfo: {
           newsletterJid: '120363421513037430@newsletter',
           newsletterName: "VORTEX XMD",
-          serverMessageId: Math.floor(100000 + Math.random() * 900000),
+          serverMessageId: -1 * 900000),
         },
         externalAdReply: {
           title: movieData.Title,
@@ -104,7 +104,7 @@ ${newsletterFooter}
           thumbnailUrl: movieData.Poster || trailerData.thumbnail,
           sourceUrl: trailerData.url,
           renderLargerThumbnail: true,
-          showAdAttribution: true
+          showAdAttribution: false
         }
       }
     }, { quoted: ms });
@@ -122,7 +122,7 @@ ${newsletterFooter}
         forwardedNewsletterMessageInfo: {
           newsletterJid: '120363421513037430@newsletter',
           newsletterName: "VORTEX XMD",
-          serverMessageId: Math.floor(100000 + Math.random() * 900000),
+          serverMessageId: -1 * 900000),
         },
         externalAdReply: {
           title: trailerData.title,
@@ -131,7 +131,7 @@ ${newsletterFooter}
           thumbnailUrl: trailerData.thumbnail,
           sourceUrl: trailerData.url,
           renderLargerThumbnail: true,
-          showAdAttribution: true
+          showAdAttribution: false
         }
       }
     }, { quoted: ms });
@@ -160,7 +160,7 @@ ${newsletterFooter}
         forwardedNewsletterMessageInfo: {
           newsletterJid: '120363421513037430@newsletter',
           newsletterName: "VORTEX XMD",
-          serverMessageId: Math.floor(100000 + Math.random() * 900000),
+          serverMessageId: -1 * 900000),
         }
       }
     }, { quoted: ms });
@@ -177,7 +177,7 @@ ${newsletterFooter}
         forwardedNewsletterMessageInfo: {
           newsletterJid: '120363421513037430@newsletter',
           newsletterName: "VORTEX XMD",
-          serverMessageId: Math.floor(100000 + Math.random() * 900000),
+          serverMessageId: -1 * 900000),
         }
       }
     }, { quoted: ms });
