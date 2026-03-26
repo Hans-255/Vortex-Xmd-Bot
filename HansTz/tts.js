@@ -1,4 +1,4 @@
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const axios = require("axios"); // Using axios for API requests
 
 // Function to get TTS audio URL
