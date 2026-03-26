@@ -10,20 +10,21 @@ const os = require('os');
 const NEWSLETTER_JID = '120363421513037430@newsletter';
 
 const makeCtx = (label) => ({
-    forwardingScore: 999,
     isForwarded: true,
+    forwardingScore: 999,
     forwardedNewsletterMessageInfo: {
         newsletterJid: NEWSLETTER_JID,
         newsletterName: 'VORTEX XMD',
-        serverMessageId: Math.floor(100000 + Math.random() * 900000)
+        serverMessageId: -1
     },
     externalAdReply: {
+        showAdAttribution: false,
+        renderLargerThumbnail: false,
         title: `VORTEX XMD | ${label}`,
         body: 'Audio Effect | HansTz Bot',
         thumbnailUrl: getRandomImage(),
         mediaType: 1,
-        sourceUrl: 'https://github.com/Hans-255/Vortex-Xmd-Bot',
-        showAdAttribution: true
+        sourceUrl: 'https://github.com/Hans-255/Vortex-Xmd-Bot'
     }
 });
 
@@ -31,39 +32,32 @@ const downloadAudio = async (audioMsg) => {
     const stream = await downloadContentFromMessage(audioMsg, 'audio');
     const chunks = [];
     for await (const chunk of stream) chunks.push(chunk);
-    const buffer = Buffer.concat(chunks);
-    const tmpPath = `${os.tmpdir()}/${Date.now()}_input.audio`;
-    fs.writeFileSync(tmpPath, buffer);
-    return tmpPath;
+    const buf = Buffer.concat(chunks);
+    const p = `${os.tmpdir()}/${Date.now()}_in.audio`;
+    fs.writeFileSync(p, buf);
+    return p;
 };
 
-const applyAndSend = (inputPath, filter, label, zk, dest, ms, repondre) => new Promise(resolve => {
-    const outPath = `${os.tmpdir()}/${Date.now()}_output.mp3`;
-    const cmd = `"${ffmpegPath}" -y -i "${inputPath}" ${filter} "${outPath}"`;
-    exec(cmd, (err) => {
-        try { fs.unlinkSync(inputPath); } catch (_) {}
+const applyAndSend = (inp, filter, label, zk, dest, ms, repondre) => new Promise(resolve => {
+    const out = `${os.tmpdir()}/${Date.now()}_out.mp3`;
+    exec(`"${ffmpegPath}" -y -i "${inp}" ${filter} "${out}"`, (err) => {
+        try { fs.unlinkSync(inp); } catch (_) {}
         if (err) {
             repondre('❌ Audio processing failed: ' + err.message.split('\n')[0]);
             return resolve();
         }
         try {
-            const buff = fs.readFileSync(outPath);
+            const buf = fs.readFileSync(out);
             zk.sendMessage(dest, {
-                audio: buff,
+                audio: buf,
                 mimetype: 'audio/mpeg',
                 contextInfo: makeCtx(label)
             }, { quoted: ms });
-            fs.unlinkSync(outPath);
-        } catch (e) { repondre('❌ Could not send audio'); }
+            fs.unlinkSync(out);
+        } catch (e) { repondre('❌ Could not send audio: ' + e.message); }
         resolve();
     });
 });
-
-const checkAudio = (msgRepondu, repondre) => {
-    if (!msgRepondu) { repondre('↩️ Please *reply* to an audio message'); return false; }
-    if (!msgRepondu.audioMessage) { repondre('🎵 This command only works with *audio messages*'); return false; }
-    return true;
-};
 
 const effects = [
     { cmd: 'deep',      label: 'Deep Voice',    filter: '-af atempo=4/4,asetrate=44500*2/3' },
@@ -78,7 +72,8 @@ const effects = [
 effects.forEach(({ cmd, label, filter }) => {
     adams({ nomCom: cmd, categorie: 'Audio-Edit', reaction: '🎵' }, async (dest, zk, opts) => {
         const { ms, repondre, msgRepondu } = opts;
-        if (!checkAudio(msgRepondu, repondre)) return;
+        if (!msgRepondu) return repondre('↩️ Please *reply* to an audio message');
+        if (!msgRepondu.audioMessage) return repondre('🎵 Only works with *audio messages*');
         try {
             const inp = await downloadAudio(msgRepondu.audioMessage);
             await applyAndSend(inp, filter, label, zk, dest, ms, repondre);
