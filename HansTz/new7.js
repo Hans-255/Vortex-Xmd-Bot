@@ -368,7 +368,7 @@ adams({
         responseText += "No personal data or exact location is accessed.\n";
         
         responseText += "\n━━━━━━━━━━━━━━━━━━━━━━\n";
-        responseText += "> © BWM-XMD Phone Tracker";
+        responseText += "> © VORTEX XMD Phone Tracker";
 
         await zk.sendMessage(dest, {
             text: responseText,
@@ -378,7 +378,7 @@ adams({
                     body: `${phoneInfo.format} • ${phoneInfo.carrier || 'Carrier Unknown'}`,
                     mediaType: 1,
                     thumbnailUrl: "' + getRandomImage() + '",
-                    sourceUrl: "https://bwmxmd.online",
+                    sourceUrl: "https://github.com/Hans-255/Vortex-Xmd-Bot",
                     renderLargerThumbnail: false,
                     showAdAttribution: true,
                  }
@@ -623,7 +623,7 @@ adams({
                     body: `${data.country} • ${data.city} • ${data.isp}`,
                     mediaType: 1,
                     thumbnailUrl: "' + getRandomImage() + '",
-                    sourceUrl: "https://bwmxmd.online",
+                    sourceUrl: "https://github.com/Hans-255/Vortex-Xmd-Bot",
                     renderLargerThumbnail: false,
                     showAdAttribution: true,
                 }
@@ -669,7 +669,7 @@ adams({
         caption += `🔢 *Characters:* ${text.length}\n`;
         caption += `⚡ *Type:* ${text.startsWith('http') ? 'URL' : text.includes('@') ? 'Email' : text.match(/^\+?[\d\s-]+$/) ? 'Phone' : 'Text'}\n\n`;
         caption += `📱 *Scan with any QR reader*\n`;
-        caption += `> BWM-XMD QR Generator`;
+        caption += `> VORTEX XMD QR Generator`;
 
         await zk.sendMessage(dest, {
             image: { url: qrUrl },
@@ -680,7 +680,7 @@ adams({
                     body: `${text.length} characters • Ready to scan`,
                     mediaType: 1,
                     thumbnailUrl: qrUrl,
-                    sourceUrl: "https://bwmxmd.online",
+                    sourceUrl: "https://github.com/Hans-255/Vortex-Xmd-Bot",
                     renderLargerThumbnail: false,
                     showAdAttribution: true,
                 }
@@ -741,7 +741,7 @@ adams({
         response += `Antivirus: Protected\n`;
         response += `SSL: Enabled\n\n`;
         
-        response += `> BWM-XMD System Monitor`;
+        response += `> VORTEX XMD System Monitor`;
 
         await zk.sendMessage(dest, { text: response }, { quoted: ms });
 
