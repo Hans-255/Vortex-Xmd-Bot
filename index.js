@@ -1720,7 +1720,7 @@ vortex.ev.on('messages.upsert', async (msg) => {
 
         console.log("lorded all commands successfully 🤗\n");
         try {
-            const taskflowPath = path.join(__dirname, "adams");
+            const taskflowPath = path.join(__dirname, "HansTz");
             fs.readdirSync(taskflowPath).forEach((fichier) => {
                 if (path.extname(fichier).toLowerCase() === ".js") {
                     try {
@@ -1993,7 +1993,13 @@ vortex.ev.on('messages.upsert', async (msg) => {
                             msgRepondu,
                             auteurMsgRepondu: auteurMsgRepondu || '',
                             isSuperUser,
-                            isBotOwner
+                            isBotOwner,
+                            mybotpic: getRandomImage,
+                            conf,
+                            texte,
+                            nomBot: conf.BOT_NAME || 'VORTEX XMD',
+                            PREFIX: conf.PREFIX || '.',
+                            com
                         };
 
                         await cmd.fonction(origineMessage, adams, context);
@@ -2039,29 +2045,42 @@ vortex.ev.on('messages.upsert', async (msg) => {
         setTimeout(async () => {
             try {
                 console.log('🚀 Enjoy VORTEX md speed 🌎');
-                
-                if (conf.DP === "yes") {
-                    const md = conf.MODE === "yes" ? "public" : "private";
-                    const connectionMsg = `┌─❖
-│VORTEX XMD 
-│ ✅ Prefix: [ ${conf.PREFIX} ] 
-│ ☣️ Mode: *${md}*
-│ 🔄 Auto-fix: *ONLINE*
-└─────────────────┈ ⳹`;
+                const md = conf.MODE === "yes" ? "PUBLIC" : "PRIVATE";
+                const ownerJid = `${conf.OWNER_NUMBER}@s.whatsapp.net`;
+                const botSelf = vortex.user?.id;
+                const connectionMsg = `╔══════════════════╗
+║  🌟 *VORTEX XMD* 🌟  ║
+╚══════════════════╝
 
+✅ *Bot is ONLINE!*
+⚡ *Status:* Connected
+🔰 *Prefix:* [ ${conf.PREFIX} ]
+☣️ *Mode:* ${md}
+🔄 *Auto-fix:* ACTIVE
+⏰ *Time:* ${new Date().toLocaleString('en-US', { timeZone: 'Africa/Dar_es_Salaam' })}
+
+> *Powered by VORTEX XMD*`;
+
+                const targets = [ownerJid];
+                if (botSelf && botSelf !== ownerJid) targets.push(botSelf);
+
+                for (const target of targets) {
+                    try {
+                        await vortex.sendMessage(target, { text: connectionMsg });
+                    } catch (e) {}
+                }
+
+                if (conf.DP === "yes") {
                     await vortex.sendMessage(
-                        vortex.user.id,
+                        botSelf,
                         {
                             text: connectionMsg,
-                            ...createContext("BWM XMD", {
+                            ...createContext("VORTEX XMD", {
                                 title: "SYSTEM ONLINE",
                                 body: "VORTEX XMD"
                             })
                         },
-                        {
-                            disappearingMessagesInChat: true,
-                            ephemeralExpiration: 600,
-                        }
+                        { disappearingMessagesInChat: true, ephemeralExpiration: 600 }
                     );
                 }
             } catch (err) {
