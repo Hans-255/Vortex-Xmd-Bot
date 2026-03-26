@@ -233,7 +233,7 @@ adams({
             document: { url: apkUrl },
             mimetype: 'application/vnd.android.package-archive',
             fileName: `${appName.replace(/\s+/g, '_')}.apk`,
-            caption: `${appName} APK - Downloaded by BWM XMD`
+            caption: `${appName} APK - Downloaded by VORTEX XMD`
         }, { quoted: ms });
 
     } catch (error) {
@@ -262,7 +262,7 @@ adams({
 
         await zk.sendMessage(dest, {
             video: { url: videoUrl },
-            caption: 'YouTube video downloaded by BWM XMD'
+            caption: 'YouTube video downloaded by VORTEX XMD'
         }, { quoted: ms });
 
     } catch (error) {
@@ -293,7 +293,7 @@ adams({
             audio: { url: audioUrl },
             mimetype: 'audio/mpeg',
             fileName: 'spotify_track.mp3',
-            caption: 'Spotify track downloaded by BWM XMD'
+            caption: 'Spotify track downloaded by VORTEX XMD'
         }, { quoted: ms });
 
     } catch (error) {
