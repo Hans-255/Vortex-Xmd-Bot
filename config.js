@@ -6,9 +6,11 @@ const _s = {
     // Identity
     BOT_NAME:            process.env.BOT_NAME            || 'VORTEX XMD',
     PREFIX:              process.env.PREFIX               || '.',
-    OWNER:               process.env.OWNER               || '',
+    OWNER:               process.env.OWNER               || process.env.OWNER_NUMBER || '',
+    OWNER_NUMBER:        process.env.OWNER_NUMBER         || process.env.OWNER        || '',
     OWNER_NAME:          process.env.OWNER_NAME           || 'HansTz',
     SESSION_ID:          process.env.SESSION_ID           || '',
+    session:             process.env.SESSION_ID           || '',  // alias used by index.js
     HEROKU_APP_NAME:     process.env.HEROKU_APP_NAME      || 'vortex',
     HEROKU_API_KEY:      process.env.HEROKU_API_KEY       || '',
     TZ:                  process.env.TZ                   || 'Africa/Nairobi',
