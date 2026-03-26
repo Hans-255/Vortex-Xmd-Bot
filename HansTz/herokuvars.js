@@ -684,8 +684,7 @@ const autoFeatures = [
     'autoreactstatus',
     'autoreadstatus',
     'autodownloadstatus',
-    'antideleterecover',
-    'anticall'
+    'antideleterecover'
 ];
 
 autoFeatures.forEach(feature => {
@@ -726,8 +725,7 @@ autoFeatures.forEach(feature => {
             'autoreactstatus': { key: 'AUTO_REACT_STATUS', value: value, name: 'Auto React Status' },
             'autoreadstatus': { key: 'AUTO_READ_STATUS', value: value, name: 'Auto Read Status' },
             'autodownloadstatus': { key: 'AUTO_DOWNLOAD_STATUS', value: value, name: 'Auto Download Status' },
-            'antideleterecover': { key: 'ANTIDELETE_RECOVER_CONVENTION', value: value, name: 'Anti Delete Recover Convention' },
-            'anticall': { key: 'AUTO_REJECT_CALL', value: value, name: 'Anti call' }
+            'antideleterecover': { key: 'ANTIDELETE_RECOVER_CONVENTION', value: value, name: 'Anti Delete Recover Convention' }
         };
 
         const setting = featureMap[feature];
@@ -749,6 +747,73 @@ autoFeatures.forEach(feature => {
             repondre(`⚠️ *Error: ${error.message}*`);
         }
     });
+});
+
+// ==================== ANTICALL COMMANDS ====================
+adams({ nomCom: 'anticall', categorie: 'Control' }, async (chatId, zk, context) => {
+    const { repondre, superUser, arg } = context;
+    if (!superUser) return repondre("🚫 *Access Denied!* Owner only command.");
+
+    const anticallOn = (await hybridConfig.getSetting('AUTO_REJECT_CALL', 'no')) === 'yes';
+    const anticallBlockOn = (await hybridConfig.getSetting('ANTICALL_BLOCK', 'no')) === 'yes';
+
+    // No args → show current state info
+    if (!arg || arg.length === 0) {
+        const mode = anticallBlockOn ? '🔒 ANTICALL BLOCK (5 warns before block)' 
+                   : anticallOn ? '📵 ANTICALL ON (reject only)'
+                   : '✅ ANTICALL OFF';
+        return repondre(
+            `📵 *ANTI-CALL STATUS*\n\n` +
+            `Current mode: *${mode}*\n\n` +
+            `📋 *Available commands:*\n` +
+            `• \`anticall on\` → Reject calls + send warning text only\n` +
+            `• \`anticall off\` → Disable anticall completely\n` +
+            `• \`anticallblock on\` → Reject + 5 warnings before block\n` +
+            `• \`anticallblock off\` → Disable block mode\n\n` +
+            `> _VORTEX XMD | HansTz_`
+        );
+    }
+
+    const action = arg[0].toLowerCase();
+    if (!['on', 'off'].includes(action)) return repondre("❌ Use `anticall on` or `anticall off`");
+
+    if (action === 'on') {
+        await hybridConfig.setSetting('AUTO_REJECT_CALL', 'yes');
+        await hybridConfig.setSetting('ANTICALL_BLOCK', 'no');
+        return repondre(`✅ *ANTICALL SET TO ON*\n\n📵 All incoming calls will be *rejected only*.\nA warning text will be sent to the caller.\n\n_Use \`anticallblock on\` if you want 5 warnings before block._\n\n> _VORTEX XMD | HansTz_`);
+    } else {
+        await hybridConfig.setSetting('AUTO_REJECT_CALL', 'no');
+        return repondre(`✅ *ANTICALL TURNED OFF*\n\nIncoming calls will no longer be rejected.\n\n> _VORTEX XMD | HansTz_`);
+    }
+});
+
+adams({ nomCom: 'anticallblock', categorie: 'Control' }, async (chatId, zk, context) => {
+    const { repondre, superUser, arg } = context;
+    if (!superUser) return repondre("🚫 *Access Denied!* Owner only command.");
+
+    if (!arg || arg.length === 0) {
+        const on = (await hybridConfig.getSetting('ANTICALL_BLOCK', 'no')) === 'yes';
+        return repondre(
+            `🔒 *ANTICALL BLOCK STATUS*\n\n` +
+            `Current state: *${on ? 'ON — 5 warnings before block' : 'OFF'}*\n\n` +
+            `📋 *Commands:*\n` +
+            `• \`anticallblock on\` → Enable: 5 warnings then block caller\n` +
+            `• \`anticallblock off\` → Disable block mode\n\n` +
+            `> _VORTEX XMD | HansTz_`
+        );
+    }
+
+    const action = arg[0].toLowerCase();
+    if (!['on', 'off'].includes(action)) return repondre("❌ Use `anticallblock on` or `anticallblock off`");
+
+    if (action === 'on') {
+        await hybridConfig.setSetting('ANTICALL_BLOCK', 'yes');
+        await hybridConfig.setSetting('AUTO_REJECT_CALL', 'no');
+        return repondre(`✅ *ANTICALL SET TO FIVE WARN BEFORE BLOCK*\n\n⚠️ Callers will receive warning messages 1-4.\n🚫 On the 5th call they will be *BLOCKED*.\n\n> _VORTEX XMD | HansTz_`);
+    } else {
+        await hybridConfig.setSetting('ANTICALL_BLOCK', 'no');
+        return repondre(`✅ *ANTICALL BLOCK TURNED OFF*\n\n> _VORTEX XMD | HansTz_`);
+    }
 });
 
 // Command to restart the bot using the local endpoint
