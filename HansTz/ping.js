@@ -1,144 +1,102 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
 
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
+const { getRandomImage } = require('../Hans/images');
 
-// Constants
 const BOT_START_TIME = Date.now();
-const NEWSLETTER_INFO = {
-  jid: '120363421513037430@newsletter',
-  name: "🌐 VORTEX md Core System"
-};
-const TECH_EMOJIS = ["🚀", "⚡", "🔋", "💻", "🔌", "🌐", "📶", "🖥️", "🔍", "📊"];
+const NEWSLETTER_JID = '120363421513037430@newsletter';
+const TECH_EMOJIS = ["🚀","⚡","🔋","💻","🔌","🌐","📶","🖥️","🔍","📊"];
+const randomEmoji = () => TECH_EMOJIS[Math.floor(Math.random() * TECH_EMOJIS.length)];
 
-// Helper functions
-const randomTechEmoji = () => TECH_EMOJIS[Math.floor(Math.random() * TECH_EMOJIS.length)];
-const getSystemTime = () => {
-  return new Date().toLocaleString("en-US", {
-    timeZone: "Africa/Nairobi",
-    hour12: true,
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-};
+const getSystemTime = () => new Date().toLocaleString("en-US", {
+    timeZone: "Africa/Nairobi", hour12: true,
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+});
 
-// 🏓 Network Ping Command
-adams(
-  { nomCom: "ping", reaction: "🏓", nomFichier: __filename },
-  async (dest, zk, commandeOptions) => {
+const makeContext = () => ({
+    forwardingScore: 999,
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+        newsletterJid: NEWSLETTER_JID,
+        newsletterName: "VORTEX XMD",
+        serverMessageId: Math.floor(100000 + Math.random() * 900000)
+    },
+    externalAdReply: {
+        title: "VORTEX XMD",
+        body: "HansTz Bot | Ping Response",
+        thumbnailUrl: getRandomImage(),
+        mediaType: 1,
+        sourceUrl: 'https://github.com/Hans-255/Vortex-Xmd-Bot',
+        showAdAttribution: true
+    }
+});
+
+// Ping command
+adams({ nomCom: "ping", reaction: "🏓" }, async (dest, zk, commandeOptions) => {
     const { ms } = commandeOptions;
     const startTime = process.hrtime();
-    
-    // Simulate network processing delay
     await new Promise(resolve => setTimeout(resolve, Math.floor(80 + Math.random() * 420)));
-    
     const elapsed = process.hrtime(startTime);
     const responseTime = Math.floor((elapsed[0] * 1000) + (elapsed[1] / 1000000));
     
-    // Network metrics
     const latency = Math.floor(20 + Math.random() * 80);
     const jitter = Math.floor(1 + Math.random() * 12);
     const packetLoss = (Math.random() * 0.4).toFixed(2);
     const serverLoad = Math.floor(10 + Math.random() * 30);
-    
     const statusEmoji = responseTime < 100 ? "🟢" : responseTime < 250 ? "🟡" : "🔴";
-    const speedRating = responseTime < 100 ? "OPTIMAL" : 
-                       responseTime < 200 ? "STANDARD" : 
-                       responseTime < 350 ? "HIGH LATENCY" : "CONGESTED";
+    const speedRating = responseTime < 100 ? "OPTIMAL" : responseTime < 200 ? "STANDARD" : 
+                        responseTime < 350 ? "HIGH LATENCY" : "CONGESTED";
 
-    await zk.sendMessage(dest, {
-      text: `*${randomTechEmoji()} NETWORK PERFORMANCE ${randomTechEmoji()}*\n\n` +
-            `🕒 System Time: ${getSystemTime()}\n` +
-            `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰\n` +
-            `⚡ Response: ${responseTime}ms ${statusEmoji}\n` +
-            `📶 Quality: ${speedRating}\n\n` +
-            `🔧 Core Metrics:\n` +
-            `├ Latency: ${latency}ms\n` +
-            `├ Jitter: ±${jitter}ms\n` +
-            `├ Loss: ${packetLoss}%\n` +
-            `└ Load: ${serverLoad}%\n\n` +
-            `🌐 Routing: Automatic Optimization\n` +
-            `🖥️ Server: Core-${Math.floor(1000 + Math.random() * 9000)}\n` +
-            `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰\n` +
-            `*${NEWSLETTER_INFO.name}* • ${getSystemTime()}`,
-      contextInfo: {
-        forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: NEWSLETTER_INFO.jid,
-          newsletterName: NEWSLETTER_INFO.name,
-          serverMessageId: Math.floor(100000 + Math.random() * 900000)
-        }
-      }
-    }, { quoted: ms });
-  }
-);
+    const text = `*${randomEmoji()} VORTEX XMD PING ${randomEmoji()}*\n\n` +
+        `🕒 Time: ${getSystemTime()}\n` +
+        `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰\n` +
+        `⚡ Response: ${responseTime}ms ${statusEmoji}\n` +
+        `📶 Quality: ${speedRating}\n\n` +
+        `🔧 Metrics:\n` +
+        `├ Latency: ${latency}ms\n` +
+        `├ Jitter: ±${jitter}ms\n` +
+        `├ Loss: ${packetLoss}%\n` +
+        `└ Load: ${serverLoad}%\n\n` +
+        `*VORTEX XMD* | by HansTz`;
 
-// ⏳ System Uptime Command
-adams(
-  { nomCom: "uptime", reaction: "⏳", nomFichier: __filename },
-  async (dest, zk, commandeOptions) => {
+    try {
+        await zk.sendMessage(dest, {
+            image: { url: getRandomImage() },
+            caption: text,
+            contextInfo: makeContext()
+        }, { quoted: ms });
+    } catch {
+        await zk.sendMessage(dest, { text, contextInfo: makeContext() }, { quoted: ms });
+    }
+});
+
+// Uptime command
+adams({ nomCom: "uptime", reaction: "⏳" }, async (dest, zk, commandeOptions) => {
     const { ms } = commandeOptions;
     const uptimeMs = Date.now() - BOT_START_TIME;
-    
     const seconds = Math.floor((uptimeMs / 1000) % 60);
     const minutes = Math.floor((uptimeMs / (1000 * 60)) % 60);
     const hours = Math.floor((uptimeMs / (1000 * 60 * 60)) % 24);
     const days = Math.floor(uptimeMs / (1000 * 60 * 60 * 24));
 
-    await zk.sendMessage(dest, {
-      text: `*${randomTechEmoji()} SYSTEM UPTIME ${randomTechEmoji()}*\n\n` +
-            `🕒 System Time: ${getSystemTime()}\n` +
-            `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰\n` +
-            `⏱️ Duration: ${days}d ${hours}h ${minutes}m ${seconds}s\n` +
-            `📅 Activated: ${new Date(BOT_START_TIME).toLocaleString("en-US", {timeZone: "Africa/Nairobi"})}\n\n` +
-            `⚡ Performance:\n` +
-            `├ Reliability: 99.${Math.floor(95 + Math.random() * 4)}%\n` +
-            `├ Stability: ${Math.floor(90 + Math.random() * 9)}%\n` +
-            `└ Nodes: Global Distribution\n\n` +
-            `🔋 Maintenance: Auto-Scheduled\n` +
-            `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰\n` +
-            `*${NEWSLETTER_INFO.name}* • ${getSystemTime()}`,
-      contextInfo: {
-        forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: NEWSLETTER_INFO.jid,
-          newsletterName: NEWSLETTER_INFO.name,
-          serverMessageId: Math.floor(100000 + Math.random() * 900000)
-        }
-      }
-    }, { quoted: ms });
-  }
-);
+    const text = `*${randomEmoji()} VORTEX XMD UPTIME ${randomEmoji()}*\n\n` +
+        `🕒 Time: ${getSystemTime()}\n` +
+        `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰\n` +
+        `⏱️ Uptime: ${days}d ${hours}h ${minutes}m ${seconds}s\n\n` +
+        `⚡ Performance:\n` +
+        `├ Reliability: 99.${Math.floor(95 + Math.random() * 4)}%\n` +
+        `├ Stability: ${Math.floor(90 + Math.random() * 9)}%\n` +
+        `└ Status: 🟢 ONLINE\n\n` +
+        `*VORTEX XMD* | by HansTz`;
 
-// 🎵 Global Tech Audio Command
-adams(
-  { nomCom: "pairaudio", reaction: "🎵", nomFichier: __filename },
-  async (dest, zk, commandeOptions) => {
-    const { ms } = commandeOptions;
-    await zk.sendMessage(dest, {
-      audio: { url: "' + getRandomImage() + '" },
-      mimetype: "audio/mpeg",
-      ptt: true,
-      contextInfo: {
-        forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: NEWSLETTER_INFO.jid,
-          newsletterName: NEWSLETTER_INFO.name,
-          serverMessageId: Math.floor(100000 + Math.random() * 900000)
-        },
-        externalAdReply: {
-          title: "🔊 GLOBAL SOUND SYSTEM",
-          body: `Streaming Worldwide • ${getSystemTime()}`,
-          mediaType: 1
-        }
-      }
-    });
-  }
-);
+    try {
+        await zk.sendMessage(dest, {
+            image: { url: getRandomImage() },
+            caption: text,
+            contextInfo: makeContext()
+        }, { quoted: ms });
+    } catch {
+        await zk.sendMessage(dest, { text, contextInfo: makeContext() }, { quoted: ms });
+    }
+});
