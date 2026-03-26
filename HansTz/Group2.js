@@ -1,4 +1,4 @@
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const conf = require(__dirname + "/../config");
 const BOT_NAME = "VORTEX XMD";
 const BOT_TAGLINE = "Next-Gen WhatsApp Automation";
