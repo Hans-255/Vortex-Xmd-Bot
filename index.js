@@ -1722,15 +1722,37 @@ vortex.ev.on('messages.upsert', async (msg) => {
         console.log("lorded all commands successfully 🤗\n");
         try {
             const taskflowPath = path.join(__dirname, "HansTz");
+            const Module = require('module');
+            const _origExt = Module._extensions['.js'];
+
+            // Patch the require loader to fix mixed-quote syntax errors in HansTz files
+            // All HansTz files have: require('../Hans/adams") — mismatched ' and "
+            Module._extensions['.js'] = function(mdl, filename) {
+                if (filename.includes('HansTz')) {
+                    let content = fs.readFileSync(filename, 'utf8');
+                    content = content.replace(/require\('([^'"]+)"\)/g, "require('$1')");
+                    content = content.replace(/require\("([^'"]+)'\)/g, 'require("$1")');
+                    mdl._compile(content, filename);
+                } else {
+                    _origExt(mdl, filename);
+                }
+            };
+
+            let loadedCount = 0;
             fs.readdirSync(taskflowPath).forEach((fichier) => {
                 if (path.extname(fichier).toLowerCase() === ".js") {
                     try {
                         require(path.join(taskflowPath, fichier));
+                        loadedCount++;
                     } catch (e) {
                         console.error(`❌ Failed to load ${fichier}: ${e.message}`);
                     }
                 }
             });
+
+            // Restore original loader
+            Module._extensions['.js'] = _origExt;
+            console.log(`✅ Loaded ${loadedCount} HansTz command files`);
         } catch (error) {
             console.error("❌ Error reading Taskflow folder:", error.message);
         }
