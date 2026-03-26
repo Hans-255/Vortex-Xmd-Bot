@@ -1,25 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const axios = require("axios");
 
-const githubRawBaseUrl =
-  "https://raw.githubusercontent.com/ibrahimaitech/bwm-xmd-music/master/tiktokmusic";
+const { getRandomImage } = require("../Hans/images"); // audio from parent index
 
-const audioFiles = Array.from({ length: 100 }, (_, i) => `sound${i + 1}.mp3`);
-
-const images = [
-  "https://bwm-xmd-files.vercel.app/bwmxmd_lzgu8w.jpeg",
-  "https://bwm-xmd-files.vercel.app/bwmxmd_9s9jr8.jpeg",
-  "https://bwm-xmd-files.vercel.app/bwmxmd_psaclm.jpeg",
-  "https://bwm-xmd-files.vercel.app/bwmxmd_1tksj5.jpeg",
-  "https://bwm-xmd-files.vercel.app/bwmxmd_v4jirh.jpeg",
-  "https://bwm-xmd-files.vercel.app/bwmxmd_d8cv2v.png",
-  "' + getRandomImage() + '",
-  "' + getRandomImage() + '",
-  "' + getRandomImage() + '",
-  "' + getRandomImage() + '",
-];
+const { getRandomImage } = require("../Hans/images");
 
 adams(
   { nomCom: "alive", reaction: "🪄", nomFichier: __filename },
@@ -53,7 +39,7 @@ adams(
     try {
       // Randomly pick an audio file and image
       const randomAudioFile = audioFiles[Math.floor(Math.random() * audioFiles.length)];
-      const randomImage = images[Math.floor(Math.random() * images.length)];
+      const getRandomImage() = images[Math.floor(Math.random() * images.length)];
       const audioUrl = `${githubRawBaseUrl}/${randomAudioFile}`;
 
       // Verify if the audio file exists
@@ -72,7 +58,7 @@ adams(
       const externalAdReply = {
         title: `${greeting}, ${contactName} 🚀`,
         body: "🚀 Always Active 🚀",
-        thumbnailUrl: randomImage,
+        thumbnailUrl: getRandomImage(),
         mediaType: 1,
         renderLargerThumbnail: true,
       };
@@ -88,7 +74,7 @@ adams(
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
             newsletterJid: '120363421513037430@newsletter',
-            newsletterName: "VORTEX md",
+            newsletterName: "VORTEX XMD",
             serverMessageId: 143,
           },
           externalAdReply, // Ensuring image is part of the newsletter
@@ -136,7 +122,7 @@ adams(
     try {
       // Randomly pick an audio file and image
       const randomAudioFile = audioFiles[Math.floor(Math.random() * audioFiles.length)];
-      const randomImage = images[Math.floor(Math.random() * images.length)];
+      const getRandomImage() = images[Math.floor(Math.random() * images.length)];
       const audioUrl = `${githubRawBaseUrl}/${randomAudioFile}`;
 
       // Verify if the audio file exists
@@ -155,7 +141,7 @@ adams(
       const externalAdReply = {
         title: `${greeting}, ${contactName} 🚀`,
         body: "🚀 Always Active 🚀",
-        thumbnailUrl: randomImage,
+        thumbnailUrl: getRandomImage(),
         mediaType: 1,
         renderLargerThumbnail: true,
       };
@@ -171,7 +157,7 @@ adams(
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
             newsletterJid: '120363421513037430@newsletter',
-            newsletterName: "VORTEX md",
+            newsletterName: "VORTEX XMD",
             serverMessageId: 143,
           },
           externalAdReply, // Ensuring image is part of the newsletter
