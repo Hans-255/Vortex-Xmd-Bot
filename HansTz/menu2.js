@@ -1,14 +1,14 @@
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const moment = require("moment-timezone");
 const s = require(__dirname + "/../config");
 const axios = require("axios");
+const { getRandomImage } = require('../Hans/images');
 const readMore = String.fromCharCode(8206).repeat(4000); 
 const PREFIX = s.PREFIX;
 
 // Configurable elements from config.js
 const {
     BOT: BOT_NAME = 'VORTEX XMD',
-    BOT_URL: MEDIA_URLS = [],
     MENU_TOP_LEFT = "┌─❖",
     MENU_BOT_NAME_LINE = "│ ",
     MENU_BOTTOM_LEFT = "└┬❖",
@@ -19,17 +19,10 @@ const {
     MENU_TIME_LINE = "│⏰ ",
     MENU_STATS_LINE = "│⭐ ",
     MENU_BOTTOM_DIVIDER = "└─────────────┈⳹",
-    FOOTER = `\n\n©Sir ultra\n\n╭━========================\n┃  ᴛᴏ sᴇᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs ᴛᴏɢᴇᴛʜᴇʀ ᴜsᴇ \n┃ *${PREFIX} Cmds*\n┃ *${PREFIX} Help*\n┃ *${PREFIX} list*\n┃ *${PREFIX} Commands* \n╰━========================\n\n®2025🔥`,
-    WEB = 'ibrahimadams.site',
-    GURL = 'whatsapp.com/channel/0029VaZuGSxEawdxZK9CzM0Y'
+    WEB = 'github.com/Hans-255/Vortex-Xmd-Bot',
+    GURL = 'whatsapp.com/channel/0029VakqMXuAojODCi7lXF'
 } = s;
-
-// Get random media from config (supports both images and videos)
-const randomMedia = () => {
-    if (MEDIA_URLS.length === 0) return null;
-    const url = MEDIA_URLS[Math.floor(Math.random() * MEDIA_URLS.length)].trim();
-    return url.startsWith('http') ? url : null;
-};
+const FOOTER = `\n\n© VORTEX XMD\n\n╭━========================\n┃  ᴛᴏ sᴇᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs ᴛᴏɢᴇᴛʜᴇʀ ᴜsᴇ \n┃ *${PREFIX} Cmds*\n┃ *${PREFIX} Help*\n┃ *${PREFIX} list*\n┃ *${PREFIX} Commands* \n╰━========================\n\n®2025🔥`;
 
 // Audio files
 const githubRawBaseUrl = "https://raw.githubusercontent.com/ibrahimaitech/bwm-xmd-music/master/tiktokmusic";
@@ -53,11 +46,11 @@ const categories = {
 // GitHub repo stats
 const fetchGitHubStats = async () => {
     try {
-        const owner = "ibrahimadams254";
-        const repo = "BWM-XMD-QUANTUM";
+        const owner = "Hans-255";
+        const repo = "Vortex-Xmd-Bot";
         const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}`, {
             headers: {
-                'User-Agent': 'BWM-XMD-Bot'
+                'User-Agent': 'VORTEX-XMD-Bot'
             }
         });
         const forks = response.data.forks_count || 0;
@@ -166,32 +159,23 @@ ${MENU_TIME_LINE}ᴛɪᴍᴇ: ${time}
 ${MENU_STATS_LINE}ᴜsᴇʀs: ${githubStats}       
 ${MENU_BOTTOM_DIVIDER}`;
 
-    // Select random media (image or video)
-    const selectedMedia = randomMedia();
+    // Select random image from GitHub
     let mediaMessage = {
         text: `${menuHeader}\n\n${readMore}\n${menuOptions}\n${FOOTER}`,
         contextInfo: contextInfo
     };
 
-    if (selectedMedia) {
-        try {
-            if (selectedMedia.match(/\.(mp4|gif)$/i)) {
-                mediaMessage = {
-                    video: { url: selectedMedia },
-                    gifPlayback: true,
-                    caption: `${menuHeader}\n\n${readMore}\n${menuOptions}\n${FOOTER}`,
-                    contextInfo: contextInfo
-                };
-            } else if (selectedMedia.match(/\.(jpg|jpeg|png)$/i)) {
-                mediaMessage = {
-                    image: { url: selectedMedia },
-                    caption: `${menuHeader}\n\n${readMore}\n${menuOptions}\n${FOOTER}`,
-                    contextInfo: contextInfo
-                };
-            }
-        } catch (error) {
-            console.error("Error processing media:", error);
+    try {
+        const imageUrl = await getRandomImage();
+        if (imageUrl) {
+            mediaMessage = {
+                image: { url: imageUrl },
+                caption: `${menuHeader}\n\n${readMore}\n${menuOptions}\n${FOOTER}`,
+                contextInfo: contextInfo
+            };
         }
+    } catch (error) {
+        console.error("Error fetching GitHub image for menu:", error.message);
     }
 
     // Send main menu
