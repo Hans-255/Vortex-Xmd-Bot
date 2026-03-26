@@ -857,28 +857,64 @@ if (conf.AUTO_BIO === "yes") {
     setInterval(updateBio, 3600000);
 }
 
-// Silent Anti-Call System (unchanged)
-if (conf.ANTICALL === 'yes') {
-    vortex.ev.on("call", async (callData) => {
+// ==================== ANTI-CALL SYSTEM ====================
+// Deduplication: track handled call IDs to prevent spam
+const _handledCallIds = new Map(); // callId -> timestamp
+const _callWarningCount = new Map(); // callerJid -> warning count
+
+vortex.ev.on("call", async (callData) => {
+    for (const call of callData) {
         try {
-            const caller = callData[0].from;
-            await vortex.rejectCall(callData[0].id, caller);
-            console.log('Call blocked from:', caller.slice(0, 6) + '...');
-            // Send warning message to caller
-            const warningMsg = `📵 *DON'T CALL THIS NUMBER!*
+            const callId = call.id;
+            const caller = call.from;
+            if (!caller || !callId) continue;
 
-🤖 This number is connected to *VORTEX XMD* WhatsApp bot
-👤 Owner: *${conf.OWNER_NAME || 'HansTz'}*
-🚫 Your call has been automatically rejected
+            // Skip if we already handled this exact call within 30 seconds (anti-spam)
+            const lastHandled = _handledCallIds.get(callId);
+            if (lastHandled && Date.now() - lastHandled < 30000) continue;
+            _handledCallIds.set(callId, Date.now());
 
-> _If you need assistance, send a text message instead_
-> _Powered by VORTEX XMD | HansTz_`;
-            await vortex.sendMessage(caller, { text: warningMsg });
+            // Cleanup old entries every call
+            const now = Date.now();
+            _handledCallIds.forEach((t, id) => { if (now - t > 60000) _handledCallIds.delete(id); });
+
+            const anticall = conf.ANTICALL || 'no';
+            const anticallBlock = conf.ANTICALL_BLOCK || 'no';
+
+            if (anticall === 'yes') {
+                // Mode 1: Just reject + send one warning text
+                await vortex.rejectCall(callId, caller);
+                logger.info('📵 Call rejected from: ' + caller.split('@')[0]);
+                await vortex.sendMessage(caller, {
+                    text: `📵 *DON'T CALL MY OWNER!*\n\n🤖 This number is a *VORTEX XMD* WhatsApp bot\n👤 Owner: *${conf.OWNER_NAME || 'HansTz'}*\n🚫 Your call was automatically rejected\n\n> _Send a text message instead_\n> _Powered by VORTEX XMD | HansTz_`
+                });
+
+            } else if (anticallBlock === 'yes') {
+                // Mode 2: Reject + track 5 warnings, then block on the 5th
+                await vortex.rejectCall(callId, caller);
+                const count = (_callWarningCount.get(caller) || 0) + 1;
+                _callWarningCount.set(caller, count);
+                logger.info(`📵 Anticall-block: caller ${caller.split('@')[0]} warning ${count}/5`);
+
+                if (count >= 5) {
+                    // Final warning then block
+                    await vortex.sendMessage(caller, {
+                        text: `🚫 *YOU HAVE BEEN BLOCKED!*\n\n⚠️ You have called this bot number 5 times.\n👤 Owner: *${conf.OWNER_NAME || 'HansTz'}*\n❌ You are now BLOCKED.\n\n> _Powered by VORTEX XMD | HansTz_`
+                    });
+                    await vortex.updateBlockStatus(caller, 'block');
+                    _callWarningCount.delete(caller);
+                } else {
+                    const remaining = 5 - count;
+                    await vortex.sendMessage(caller, {
+                        text: `⚠️ *CALL WARNING ${count}/5*\n\n📵 Don't call this number! This is *VORTEX XMD* bot.\n👤 Owner: *${conf.OWNER_NAME || 'HansTz'}*\n\n🚨 *${remaining} more call(s) and you will be BLOCKED!*\n\n> _Powered by VORTEX XMD | HansTz_`
+                    });
+                }
+            }
         } catch (error) {
-            console.error('Call block failed:', error.message);
+            logger.error('Call handler error:', error.message);
         }
-    });
-}
+    }
+});
 
 const updatePresence = async (jid) => {
     try {
@@ -1226,12 +1262,21 @@ if (conf.AUTO_READ_STATUS === "yes") {
     
     vortex.ev.on("messages.upsert", async (m) => {
         try {
+            const botNumber = vortex.user?.id?.split(':')[0];
+            const botJid = botNumber ? `${botNumber}@s.whatsapp.net` : null;
             const statusUpdates = m.messages.filter(
                 msg => msg.key?.remoteJid === "status@broadcast" && 
-                      !msg.key.participant?.includes(vortex.user.id.split(':')[0])
+                      !msg.key.participant?.includes(botNumber || '')
             );
-            if (statusUpdates.length > 0) {
-                await vortex.readMessages(statusUpdates.map(msg => msg.key));
+            for (const msg of statusUpdates) {
+                try {
+                    const senderJid = msg.key.participant;
+                    const jidList = [senderJid, botJid].filter(Boolean);
+                    await vortex.readMessages([msg.key], { statusJidList: jidList });
+                    logger.info(`[Status] Viewed status from ${senderJid?.split('@')[0]}`);
+                } catch (e) {
+                    logger.error('[Status] Read error for one status:', e.message);
+                }
             }
         } catch (err) {
             logger.error("[Status] Read error:", err);
