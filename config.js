@@ -116,6 +116,7 @@ class HybridConfigManager {
                 ANTIDELETE_SENT_INBOX: process.env.ANTIDELETE_SENT_INBOX || 'yes',
                 GOODBYE_MESSAGE: process.env.GOODBYE_MESSAGE || 'no',
                 AUTO_REJECT_CALL: process.env.AUTO_REJECT_CALL || 'no',
+                ANTICALL_BLOCK: process.env.ANTICALL_BLOCK || 'no',
                 WELCOME_MESSAGE: process.env.WELCOME_MESSAGE || 'no',
                 GROUPANTILINK_REMOVE: process.env.GROUPANTILINK_REMOVE || process.env.GROUPANTILINK || 'no',
                 AUTO_REPLY_STATUS: process.env.AUTO_REPLY_STATUS || 'no'
@@ -378,6 +379,7 @@ module.exports = {
     get ANTIDELETE2() { return hybridConfig.getSetting('ANTIDELETE_SENT_INBOX', 'yes'); },
     get GOODBYE_MESSAGE() { return hybridConfig.getSetting('GOODBYE_MESSAGE', 'no'); },
     get ANTICALL() { return hybridConfig.getSetting('AUTO_REJECT_CALL', 'no'); },
+    get ANTICALL_BLOCK() { return hybridConfig.getSetting('ANTICALL_BLOCK', 'no'); },
     get WELCOME_MESSAGE() { return hybridConfig.getSetting('WELCOME_MESSAGE', 'no'); },
     get GROUP_ANTILINK2() { return process.env.GROUPANTILINK_DELETE_ONLY || 'yes'; },
     get GROUP_ANTILINK() { return hybridConfig.getSetting('GROUPANTILINK_REMOVE', 'no') || hybridConfig.getSetting('GROUPANTILINK', 'no'); },
