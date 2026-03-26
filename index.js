@@ -121,203 +121,39 @@ logger.level = "silent";
 app.use(express.static('HansTz'));
 app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"));
 
-// ENHANCED WORKER PROCESS MANAGER FOR AUTO-RESTART
-class WorkerManager {
-    constructor() {
-        this.authErrorCount = 0;
-        this.lastAuthError = 0;
-        this.maxAuthErrors = 5;
-        this.authErrorResetTime = 300000; // 5 minutes
-        this.isRestarting = false;
-        this.restartTimeout = null;
-        this.workerProcess = null;
-        this.maxRestartAttempts = 10;
-        this.currentRestartAttempt = 0;
-    }
+// Simple process handlers - PM2 handles restarts automatically
+process.on('uncaughtException', (error) => {
+    console.error('⚠️ Uncaught Exception:', error.message);
+    // Don't exit - keep bot running for non-fatal errors
+});
 
-    async handleAuthError(error) {
-        const now = Date.now();
-        const errorMessage = error.message || error.toString();
-        
-        // Check if it's the specific auth error
-        if (errorMessage.includes('Unsupported state or unable to authenticate data') || 
-            errorMessage.includes('aesDecryptGCM') ||
-            errorMessage.includes('decrypt')) {
-            
-            console.error('Fixer has detected unerror:', errorMessage);
-            
-            // Reset counter if enough time has passed
-            if (now - this.lastAuthError > this.authErrorResetTime) {
-                this.authErrorCount = 0;
-            }
-            
-            this.authErrorCount++;
-            this.lastAuthError = now;
-            
-            console.log(`Authentication error count: ${this.authErrorCount}/${this.maxAuthErrors}`);
-            
-            // Immediate restart without waiting for max errors
-            await this.restartWorker(this.authErrorCount >= this.maxAuthErrors);
-            return true;
-        }
-        
-        return false;
-    }
+process.on('unhandledRejection', (reason) => {
+    console.error('⚠️ Unhandled Rejection:', reason?.message || reason);
+    // Don't exit - keep bot running
+});
 
-    async restartWorker(cleanSession = false) {
-        if (this.isRestarting) {
-            console.log('⏳ Restart already in progress...');
-            return;
-        }
+process.on('SIGTERM', () => {
+    console.log('📡 SIGTERM received, shutting down...');
+    global.isShuttingDown = true;
+    try { if (store) store.destroy(); } catch(e) {}
+    process.exit(0);
+});
 
-        this.isRestarting = true;
-        this.currentRestartAttempt++;
+process.on('SIGINT', () => {
+    console.log('📡 SIGINT received, shutting down...');
+    global.isShuttingDown = true;
+    try { if (store) store.destroy(); } catch(e) {}
+    process.exit(0);
+});
 
-        if (this.currentRestartAttempt > this.maxRestartAttempts) {
-            console.error('🚨 Max restart attempts reached. Manual intervention required.');
-            process.exit(1);
-            return;
-        }
-
-        console.log(`🔄 Starting restart attempt ${this.currentRestartAttempt}/${this.maxRestartAttempts}...`);
-
-        try {
-            // Clean up current connections
-            if (vortex) {
-                try {
-                    await vortex.end();
-                } catch (e) {
-                    console.log('Connection cleanup warning:', e.message);
-                }
-                adams = null;
-            }
-
-            if (store) {
-                try {
-                    store.destroy();
-                } catch (e) {
-                    console.log('Store cleanup warning:', e.message);
-                }
-                store = null;
-            }
-
-            // Clean session if required
-            if (cleanSession || this.authErrorCount >= this.maxAuthErrors) {
-                try {
-                    const sessionDir = path.join(__dirname, 'sessions');
-                    if (fs.existsSync(sessionDir)) {
-                        await fs.remove(sessionDir);
-                        console.log('✅ Session directory cleaned');
-                    }
-                    this.authErrorCount = 0; // Reset counter after cleaning
-                } catch (cleanError) {
-                    console.error('Failed to clean session:', cleanError);
-                }
-            }
-
-            // Wait before restart
-            const delay = Math.min(5000 * this.currentRestartAttempt, 30000);
-            console.log(`⏱️ Waiting ${delay}ms before restart...`);
-            
-            await new Promise(resolve => setTimeout(resolve, delay));
-
-            // Restart the worker
-            console.log('🚀 Fixer is fixing the error ...');
-            this.isRestarting = false;
-            
-            // Start the main process again
-            await this.startWorker();
-
-        } catch (error) {
-            console.error('🚨 Restart failed:', error);
-            this.isRestarting = false;
-            
-            // Retry restart after delay
-            setTimeout(() => {
-                this.restartWorker(cleanSession);
-            }, 10000);
-        }
-    }
-
-    async startWorker() {
-        try {
-            await main();
-            
-            // Reset restart attempt counter on successful start
-            this.currentRestartAttempt = 0;
-            console.log('✅ Fixer fixed the error successfully');
-            
-        } catch (error) {
-            console.error('🚨 Worker start failed:', error);
-            
-            if (await this.handleAuthError(error)) {
-                return; // Auth error handled, restart initiated
-            }
-            
-            // Non-auth error, retry
-            setTimeout(() => {
-                this.restartWorker();
-            }, 5000);
-        }
-    }
-
-    setupErrorHandlers() {
-        // Enhanced process error handlers
-        process.on('uncaughtException', async (error) => {
-            console.error('🚨 Uncaught Exception:', error);
-            
-            if (!(await this.handleAuthError(error))) {
-                console.error('🔄 Non-auth uncaught exception, restarting...');
-                await this.restartWorker();
-            }
-        });
-
-        process.on('unhandledRejection', async (reason, promise) => {
-            console.error('🚨 Unhandled Rejection at:', promise, 'reason:', reason);
-            
-            if (!(await this.handleAuthError(reason))) {
-                console.error('🔄 Non-auth unhandled rejection, restarting...');
-                await this.restartWorker();
-            }
-        });
-
-        // Graceful shutdown handlers
-        process.on('SIGTERM', () => {
-            console.log('📡 SIGTERM received, shutting down gracefully...');
-            global.isShuttingDown = true;
-            try { if (store) store.destroy(); } catch(e) {}
-            process.exit(0);
-        });
-
-        process.on('SIGINT', () => {
-            console.log('📡 SIGINT received, shutting down gracefully...');
-            global.isShuttingDown = true;
-            try { if (store) store.destroy(); } catch(e) {}
-            process.exit(0);
-        });
-    }
-}
-
-// Initialize worker manager
-const workerManager = new WorkerManager();
-workerManager.setupErrorHandlers();
-
-// Health check and monitoring endpoints
+// Health check endpoint
 app.get('/health', (req, res) => {
     res.json({
-        status: vortex ? 'connected' : 'disconnected',
+        status: global.vortex ? 'connected' : 'disconnected',
         uptime: process.uptime(),
-        authErrors: workerManager.authErrorCount,
-        restartAttempts: workerManager.currentRestartAttempt,
-        isRestarting: workerManager.isRestarting,
         timestamp: new Date().toISOString(),
         memory: process.memoryUsage()
     });
-});
-
-app.get('/restart', async (req, res) => {
-    res.json({ message: 'Manual restart initiated' });
-    await workerManager.restartWorker(true);
 });
 
 app.listen(PORT, () => {
@@ -709,7 +545,7 @@ async function main() {
             console.log('✅ Custom store bound successfully');
         } catch (storeError) {
             console.error('Store binding error:', storeError);
-            if (await workerManager.handleAuthError(storeError)) return;
+            
         }
 
         vortex.ev.process(async (events) => {
@@ -718,7 +554,7 @@ async function main() {
                     await saveCreds();
                 } catch (error) {
                     console.error('Credential saving error:', error);
-                    if (await workerManager.handleAuthError(error)) return;
+                    
                 }
             }
         });
@@ -1975,13 +1811,12 @@ vortex.ev.on('messages.upsert', async (msg) => {
                                 await vortex.sendMessage(origineMessage, { 
                                     text,
                                     ...createContext(auteurMessage, {
-                                        title: options.title || nomGroupe || "BWM-XMD",
+                                        title: options.title || nomGroupe || "VORTEX XMD",
                                         body: options.body || ""
                                     })
                                 }, { quoted: ms });
                             } catch (err) {
-                                console.error("Reply error:", err);
-                                if (await workerManager.handleAuthError(err)) return;
+                                console.error('⚠️ Reply error:', err.message);
                             }
                         };
 
@@ -2030,7 +1865,7 @@ vortex.ev.on('messages.upsert', async (msg) => {
                     } catch (error) {
                         console.error(`Command error [${com}]:`, error);
                         
-                        if (await workerManager.handleAuthError(error)) return;
+                        
                         
                         try {
                             await vortex.sendMessage(origineMessage, {
@@ -2067,11 +1902,14 @@ vortex.ev.on('messages.upsert', async (msg) => {
         
         setTimeout(async () => {
             try {
-                console.log('🚀 Enjoy VORTEX md speed 🌎');
-                const md = conf.MODE === "yes" ? "PUBLIC" : "PRIVATE";
-                const ownerJid = `${conf.OWNER_NUMBER}@s.whatsapp.net`;
-                const botSelf = vortex.user?.id;
-                const connectionMsg = `╔══════════════════╗
+                console.log('🚀 VORTEX XMD is online 🌎');
+                global.vortex = vortex;
+                
+                if (conf.STARTING_BOT_MESSAGE === 'yes') {
+                    const botSelf = vortex.user?.id;
+                    if (botSelf) {
+                        const md = conf.PUBLIC_MODE === "yes" ? "PUBLIC" : "PRIVATE";
+                        const connectionMsg = `╔══════════════════╗
 ║  🌟 *VORTEX XMD* 🌟  ║
 ╚══════════════════╝
 
@@ -2079,35 +1917,19 @@ vortex.ev.on('messages.upsert', async (msg) => {
 ⚡ *Status:* Connected
 🔰 *Prefix:* [ ${conf.PREFIX} ]
 ☣️ *Mode:* ${md}
-🔄 *Auto-fix:* ACTIVE
 ⏰ *Time:* ${new Date().toLocaleString('en-US', { timeZone: 'Africa/Dar_es_Salaam' })}
 
 > *Powered by VORTEX XMD*`;
 
-                const targets = [ownerJid];
-                if (botSelf && botSelf !== ownerJid) targets.push(botSelf);
-
-                for (const target of targets) {
-                    try {
-                        await vortex.sendMessage(target, { text: connectionMsg });
-                    } catch (e) {}
-                }
-
-                if (conf.DP === "yes") {
-                    await vortex.sendMessage(
-                        botSelf,
-                        {
-                            text: connectionMsg,
-                            ...createContext("VORTEX XMD", {
-                                title: "SYSTEM ONLINE",
-                                body: "VORTEX XMD"
-                            })
-                        },
-                        { disappearingMessagesInChat: true, ephemeralExpiration: 600 }
-                    );
+                        try {
+                            await vortex.sendMessage(botSelf, { text: connectionMsg });
+                        } catch (e) {
+                            console.error('⚠️ Could not send startup message:', e.message);
+                        }
+                    }
                 }
             } catch (err) {
-                console.error("Post-connection setup error:", err);
+                console.error('Post-connection setup error:', err.message);
             }
         }, 5000);
     }
@@ -2126,91 +1948,73 @@ vortex.ev.on('messages.upsert', async (msg) => {
                 if (errorMessage.includes('Unsupported state or unable to authenticate data') || 
                     errorMessage.includes('aesDecryptGCM') ||
                     errorMessage.includes('decrypt')) {
-                    console.log('🚨 Bwm xmd fixer has detected an error we are working on it..');
-                    await workerManager.handleAuthError(new Error(errorMessage));
+                    console.error('⚠️ Auth error detected');
+                    
                     return;
                 }
                 
-                if (reason === DisconnectReason.badSession) {
-                    console.log("Your session was corrupt just a min we fix it");
-                    await workerManager.restartWorker(true);
-                } else if (reason === DisconnectReason.connectionClosed) {
-                    console.log("We have disconnected the bot but we are connecting it again with full speed");
-                    setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
-                } else if (reason === DisconnectReason.connectionLost) {
-                    console.log("We have disconnected the bot but we are connecting it again with full speed");
-                    setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
+                if (reason === DisconnectReason.badSession || reason === DisconnectReason.loggedOut) {
+                    console.log(`🔒 Session issue (${reason}), exiting for PM2 restart...`);
+                    process.exit(1);
                 } else if (reason === DisconnectReason.connectionReplaced) {
-                    console.log("Successfully Connected the bot it is starting up ✅");
-                    await workerManager.restartWorker(false);
-                } else if (reason === DisconnectReason.loggedOut) {
-                    console.log("Device logged out, triggering restart with session cleanup");
-                    await workerManager.restartWorker(true);
+                    console.log('⚠️ Connection replaced by another device. Reconnecting...');
+                    setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
                 } else if (reason === DisconnectReason.restartRequired) {
-                    console.log("Restart required, triggering restart");
-                    await workerManager.restartWorker(false);
+                    console.log('🔄 Restart required by WhatsApp...');
+                    setTimeout(() => reconnectWithRetry(), 3000);
                 } else if (reason === DisconnectReason.timedOut) {
-                    console.log("Connection timed out, reconnecting...");
+                    console.log('⏱️ Connection timed out, reconnecting...');
                     setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY * 2);
                 } else {
-                    console.log(`Unknown disconnect reason: ${reason}, attempting reconnection...`);
+                    console.log(`🔌 Disconnected (${reason}), reconnecting...`);
                     setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
                 }
             }
         });
 
-        const cleanup = () => {
-            global.isShuttingDown = true;
-            if (store) {
-                try { store.destroy(); } catch(e) {}
-            }
-            if (listenerManager) {
-                try { listenerManager.cleanupListeners(); } catch(e) {}
-            }
-        };
-
-        process.on('SIGINT', cleanup);
-        process.on('SIGTERM', cleanup);
-
     } catch (error) {
         console.error('Socket initialization error:', error);
         
         // Check if it's an auth error
-        if (await workerManager.handleAuthError(error)) return;
+        
         
         setTimeout(() => reconnectWithRetry(), RECONNECT_DELAY);
     }
 }
 
+let isReconnecting = false;
 async function reconnectWithRetry() {
+    if (global.isShuttingDown) return;
+    if (isReconnecting) return;
+    
     if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-        console.error('Max reconnection attempts reached. Triggering fixer restart...');
-        await workerManager.restartWorker(true);
+        console.error('🚨 Max reconnection attempts reached. Exiting for PM2 restart...');
+        process.exit(1);
         return;
     }
 
+    isReconnecting = true;
     reconnectAttempts++;
-    const delay = Math.min(RECONNECT_DELAY * Math.pow(2, reconnectAttempts - 1), 300000);
+    const delay = Math.min(RECONNECT_DELAY * Math.pow(2, reconnectAttempts - 1), 30000);
     
-    console.log(`Reconnection attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms...`);
+    console.log(`🔄 Reconnect attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms...`);
     
     setTimeout(async () => {
+        isReconnecting = false;
         try {
             await main();
         } catch (error) {
-            console.error('Reconnection failed:', error);
-            
-            if (!(await workerManager.handleAuthError(error))) {
-                reconnectWithRetry();
-            }
+            console.error('Reconnection failed:', error.message);
+            reconnectWithRetry();
         }
     }, delay);
 }
 
-// Start the application with enhanced worker management
-console.log('🚀 Starting Bwm xmd with quantum speed..');
+// Start VORTEX XMD
+console.log('🚀 Starting VORTEX XMD...');
 setTimeout(() => {
-    workerManager.startWorker().catch(err => {
-        console.error("Fixer initialization error:", err);
+    main().catch(err => {
+        console.error('Startup error:', err.message);
+        process.exit(1);
     });
-}, 5000);
+}, 3000);
