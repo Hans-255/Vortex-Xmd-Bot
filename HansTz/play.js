@@ -1,6 +1,7 @@
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const axios = require("axios");
 const ytSearch = require("yt-search");
+const { getRandomImage } = require('../Hans/images');
 
 // Shared API configurations
 const apiKey = 'gifted_api_6kuv56877d';
@@ -217,7 +218,7 @@ async function handleDownload(type, videoUrl, dest, zk, originalMsg) {
                         title: "Your Audio Download",
                         body: "VORTEX XMD",
                         mediaType: 2,
-                        thumbnailUrl: "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg",
+                        thumbnailUrl: (await getRandomImage()) || "https://raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg",
                         mediaUrl: downloadUrl,
                         sourceUrl: downloadUrl
                     }
@@ -236,7 +237,7 @@ async function handleDownload(type, videoUrl, dest, zk, originalMsg) {
                         title: "Your Video Download",
                         body: "VORTEX XMD",
                         mediaType: 2,
-                        thumbnailUrl: "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg",
+                        thumbnailUrl: (await getRandomImage()) || "https://raw.githubusercontent.com/Mrhanstz/HansTz-Sever/main/Database/1.jpg",
                         mediaUrl: downloadUrl,
                         sourceUrl: downloadUrl
                     }
