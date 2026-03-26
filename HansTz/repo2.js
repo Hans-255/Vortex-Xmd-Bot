@@ -67,7 +67,7 @@ commands.forEach((command) => {
           forwardedNewsletterMessageInfo: {
             newsletterJid: '120363421513037430@newsletter',
             newsletterName: "VORTEX XMD",
-            serverMessageId: Math.floor(100000 + Math.random() * 900000),
+            serverMessageId: -1 * 900000),
           },
           externalAdReply: {
             title: "🚀 Explore VORTEX XMD Updates!",
@@ -75,7 +75,7 @@ commands.forEach((command) => {
             thumbnailUrl: imageUrl,
             mediaType: 1,
             renderLargerThumbnail: true,
-            showAdAttribution: true,
+            showAdAttribution: false,
             mediaUrl: "whatsapp.com/channel/0029VaZuGSxEawdxZK9CzM0Y",
             sourceUrl: "whatsapp.com/channel/0029VaZuGSxEawdxZK9CzM0Y",
           },
@@ -115,14 +115,14 @@ commands.forEach((command) => {
                 forwardedNewsletterMessageInfo: {
                   newsletterJid: '120363421513037430@newsletter',
                   newsletterName: "VORTEX XMD",
-                  serverMessageId: Math.floor(100000 + Math.random() * 900000),
+                  serverMessageId: -1 * 900000),
                 },
                 externalAdReply: {
                   title: "🎵 VORTEX md Repo Alive Audio",
                   body: "Enjoy this random alive audio!",
                   thumbnailUrl: imageUrl,
                   mediaType: 1,
-                  showAdAttribution: true,
+                  showAdAttribution: false,
                   renderLargerThumbnail: false,
                 },
               },
