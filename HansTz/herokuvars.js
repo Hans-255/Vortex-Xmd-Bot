@@ -1,4 +1,4 @@
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 const { hybridConfig } = require("../config");
 
 // Helper function to validate configuration
@@ -567,26 +567,52 @@ adams({
     nomCom: 'autotyping',
     categorie: "Control"
 }, async (chatId, zk, context) => {
-    const { repondre, superUser } = context;
+    const { repondre, superUser, arg } = context;
 
     if (!superUser) {
         return repondre("🚫 *Access Denied!* This command is restricted to the bot owner.");
     }
 
-    return repondre("❌ *Invalid use!*\n\n✅ *Use these commands instead:*\n• `autotypingdm on/off` - Typing in private chats\n• `autotypinggroup on/off` - Typing in groups\n• `autotypingall on/off` - Typing in all chats");
+    const action = (arg[0] || '').toLowerCase();
+    if (!['on', 'off'].includes(action)) {
+        return repondre("📋 *Usage:* `.autotyping [on/off]`\n\nExample: `.autotyping on`\n\n_Enables auto typing indicator in all chats_");
+    }
+
+    const presenceValue = action === 'on' ? '5' : '0';
+    const success = await hybridConfig.setSetting('PRESENCE', presenceValue);
+    if (success) {
+        await zk.sendMessage(chatId, {
+            text: `✅ *Auto Typing is now ${action.toUpperCase()}*\n\n${action === 'on' ? '⌨️ Bot will show typing indicator in all chats' : '⏹️ Typing indicator disabled'}`
+        });
+    } else {
+        repondre("❌ Failed to update auto typing setting");
+    }
 });
 
 adams({
     nomCom: 'autorecording',
     categorie: "Control"
 }, async (chatId, zk, context) => {
-    const { repondre, superUser } = context;
+    const { repondre, superUser, arg } = context;
 
     if (!superUser) {
         return repondre("🚫 *Access Denied!* This command is restricted to the bot owner.");
     }
 
-    return repondre("❌ *Invalid use!*\n\n✅ *Use these commands instead:*\n• `autorecordingdm on/off` - Recording in private chats\n• `autorecordinggroup on/off` - Recording in groups\n• `autorecordingall on/off` - Recording in all chats");
+    const action = (arg[0] || '').toLowerCase();
+    if (!['on', 'off'].includes(action)) {
+        return repondre("📋 *Usage:* `.autorecording [on/off]`\n\nExample: `.autorecording on`\n\n_Enables auto recording indicator in all chats_");
+    }
+
+    const presenceValue = action === 'on' ? '7' : '0';
+    const success = await hybridConfig.setSetting('PRESENCE', presenceValue);
+    if (success) {
+        await zk.sendMessage(chatId, {
+            text: `✅ *Auto Recording is now ${action.toUpperCase()}*\n\n${action === 'on' ? '🎙️ Bot will show recording indicator in all chats' : '⏹️ Recording indicator disabled'}`
+        });
+    } else {
+        repondre("❌ Failed to update auto recording setting");
+    }
 });
 
 // **NEW: Specific presence commands**
