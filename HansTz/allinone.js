@@ -87,7 +87,7 @@ adams({
     const timeB = data.result[0].time;
     const timeC = data.result[0].timeZone;
 
-    await repondre(`Live Time in *${timeA}* Stats:\n\n*Date & Time:* ${timeB}\n*TimeZone:* ${timeC}\n\n> *POWERED BY BWM-XMD*`);
+    await repondre(`Live Time in *${timeA}* Stats:\n\n*Date & Time:* ${timeB}\n*TimeZone:* ${timeC}\n\n> *POWERED BY VORTEX XMD*`);
   } catch (e) {
     repondre("That country name is incorrect!");
   }
