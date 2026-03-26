@@ -42,7 +42,6 @@
     "axios": "^1.4.0",
     "body-parser": "^1.20.2",
     "cache-manager": "^5.2.1",
-    "canvacord": "^5.4.8",
     "chalk": "^5.3.0",
     "cfonts": "^3.2.0",
     "cheerio": "0.22.0",
