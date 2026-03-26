@@ -545,7 +545,7 @@ adams({
             thumbnailUrl: results[i].url,
             sourceUrl: conf.GURL,
             mediaType: 1,
-            showAdAttribution: true
+            showAdAttribution: false
           }
         }
       }, { quoted: ms });
@@ -580,7 +580,7 @@ adams({
             thumbnailUrl: image,
             sourceUrl: conf.GURL,
             mediaType: 1,
-            showAdAttribution: true
+            showAdAttribution: false
           }
         }
       }, { quoted: ms });
@@ -613,7 +613,7 @@ adams({
             thumbnailUrl: imageUrl,
             sourceUrl: conf.GURL,
             mediaType: 1,
-            showAdAttribution: true
+            showAdAttribution: false
           }
         }
       }, { quoted: ms });
@@ -645,7 +645,7 @@ adams({
             thumbnailUrl: imageUrl,
             sourceUrl: conf.GURL,
             mediaType: 1,
-            showAdAttribution: true
+            showAdAttribution: false
           }
         }
       }, { quoted: ms });
@@ -677,7 +677,7 @@ adams({
             thumbnailUrl: imageUrl,
             sourceUrl: conf.GURL,
             mediaType: 1,
-            showAdAttribution: true
+            showAdAttribution: false
           }
         }
       }, { quoted: ms });
@@ -709,7 +709,7 @@ adams({
             thumbnailUrl: imageUrl,
             sourceUrl: conf.GURL,
             mediaType: 1,
-            showAdAttribution: true
+            showAdAttribution: false
           }
         }
       }, { quoted: ms });
