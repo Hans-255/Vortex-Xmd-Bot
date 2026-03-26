@@ -1,4 +1,4 @@
-const { adams } = require('../Hans/adams");
+const { adams } = require('../Hans/adams');
 var mumaker = require("mumaker");
 
 const logoCommands = [
