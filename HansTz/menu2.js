@@ -110,7 +110,7 @@ adams({ nomCom: "menu", categorie: "General" }, async (dest, zk, commandeOptions
     forwardedNewsletterMessageInfo: {
         newsletterJid: '120363421513037430@newsletter',
         newsletterName: `${contactName}`, // Uses sender's name
-        serverMessageId: Math.floor(100000 + Math.random() * 900000),
+        serverMessageId: -1 * 900000),
     },
 };
 
