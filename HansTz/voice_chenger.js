@@ -1,12 +1,32 @@
 'use strict';
 const { adams } = require('../Hans/adams');
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const { getRandomImage } = require('../Hans/images');
 const ffmpegPath = require('ffmpeg-static');
 const fs = require('fs');
 const { exec } = require('child_process');
 const os = require('os');
 
-// Download audio from replied message to temp file
+const NEWSLETTER_JID = '120363421513037430@newsletter';
+
+const makeCtx = (label) => ({
+    forwardingScore: 999,
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+        newsletterJid: NEWSLETTER_JID,
+        newsletterName: 'VORTEX XMD',
+        serverMessageId: Math.floor(100000 + Math.random() * 900000)
+    },
+    externalAdReply: {
+        title: `VORTEX XMD | ${label}`,
+        body: 'Audio Effect | HansTz Bot',
+        thumbnailUrl: getRandomImage(),
+        mediaType: 1,
+        sourceUrl: 'https://github.com/Hans-255/Vortex-Xmd-Bot',
+        showAdAttribution: true
+    }
+});
+
 const downloadAudio = async (audioMsg) => {
     const stream = await downloadContentFromMessage(audioMsg, 'audio');
     const chunks = [];
@@ -17,8 +37,7 @@ const downloadAudio = async (audioMsg) => {
     return tmpPath;
 };
 
-// Apply ffmpeg filter and send resulting audio
-const applyAndSend = (inputPath, filter, zk, dest, ms, repondre) => new Promise(resolve => {
+const applyAndSend = (inputPath, filter, label, zk, dest, ms, repondre) => new Promise(resolve => {
     const outPath = `${os.tmpdir()}/${Date.now()}_output.mp3`;
     const cmd = `"${ffmpegPath}" -y -i "${inputPath}" ${filter} "${outPath}"`;
     exec(cmd, (err) => {
@@ -29,32 +48,40 @@ const applyAndSend = (inputPath, filter, zk, dest, ms, repondre) => new Promise(
         }
         try {
             const buff = fs.readFileSync(outPath);
-            zk.sendMessage(dest, { audio: buff, mimetype: 'audio/mpeg' }, { quoted: ms });
+            zk.sendMessage(dest, {
+                audio: buff,
+                mimetype: 'audio/mpeg',
+                contextInfo: makeCtx(label)
+            }, { quoted: ms });
             fs.unlinkSync(outPath);
         } catch (e) { repondre('❌ Could not send audio'); }
         resolve();
     });
 });
 
-const needsAudio = (msgRepondu, repondre) => {
+const checkAudio = (msgRepondu, repondre) => {
     if (!msgRepondu) { repondre('↩️ Please *reply* to an audio message'); return false; }
     if (!msgRepondu.audioMessage) { repondre('🎵 This command only works with *audio messages*'); return false; }
     return true;
 };
 
-const run = (filter) => async (dest, zk, opt) => {
-    const { ms, repondre, msgRepondu } = opt;
-    if (!needsAudio(msgRepondu, repondre)) return;
-    try {
-        const inp = await downloadAudio(msgRepondu.audioMessage);
-        await applyAndSend(inp, filter, zk, dest, ms, repondre);
-    } catch (e) { repondre('❌ Error: ' + e.message); }
-};
+const effects = [
+    { cmd: 'deep',      label: 'Deep Voice',    filter: '-af atempo=4/4,asetrate=44500*2/3' },
+    { cmd: 'bass',      label: 'Bass Boost',    filter: '-af equalizer=f=18:width_type=o:width=2:g=14' },
+    { cmd: 'reverse',   label: 'Reverse Audio', filter: '-filter_complex areverse' },
+    { cmd: 'slow',      label: 'Slow Down',     filter: '-af atempo=0.7' },
+    { cmd: 'smooth',    label: 'Smooth Echo',   filter: '-af aecho=0.8:0.88:60:0.4' },
+    { cmd: 'tempo',     label: 'Fast Tempo',    filter: '-af atempo=1.5' },
+    { cmd: 'nightcore', label: 'Nightcore',     filter: '-filter:a atempo=1.07,asetrate=44100*1.20' },
+];
 
-adams({ nomCom: 'deep',      categorie: 'Audio-Edit' }, run('-af atempo=4/4,asetrate=44500*2/3'));
-adams({ nomCom: 'bass',      categorie: 'Audio-Edit' }, run('-af equalizer=f=18:width_type=o:width=2:g=14'));
-adams({ nomCom: 'reverse',   categorie: 'Audio-Edit' }, run('-filter_complex areverse'));
-adams({ nomCom: 'slow',      categorie: 'Audio-Edit' }, run('-af atempo=0.7'));
-adams({ nomCom: 'smooth',    categorie: 'Audio-Edit' }, run('-af aecho=0.8:0.88:60:0.4'));
-adams({ nomCom: 'tempo',     categorie: 'Audio-Edit' }, run('-af atempo=1.5'));
-adams({ nomCom: 'nightcore', categorie: 'Audio-Edit' }, run('-filter:a atempo=1.07,asetrate=44100*1.20'));
+effects.forEach(({ cmd, label, filter }) => {
+    adams({ nomCom: cmd, categorie: 'Audio-Edit', reaction: '🎵' }, async (dest, zk, opts) => {
+        const { ms, repondre, msgRepondu } = opts;
+        if (!checkAudio(msgRepondu, repondre)) return;
+        try {
+            const inp = await downloadAudio(msgRepondu.audioMessage);
+            await applyAndSend(inp, filter, label, zk, dest, ms, repondre);
+        } catch (e) { repondre('❌ Error: ' + e.message); }
+    });
+});
