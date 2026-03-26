@@ -1,33 +1,29 @@
-const NEWS_LETTER_JID = '120363421513037430@newsletter'; // Replace with your real one
-const BOT_NAME = "VORTEX XMD";
-const DEFAULT_THUMBNAIL = "https://res.cloudinary.com/dptzpfgtm/image/upload/v1753723388/whatsapp_uploads/wqyliw4kzvrulh0bmg10.jpg";
+const { getRandomImage, NEWSLETTER_JID, BOT_NAME } = require('./images');
 
 const createContext = (userJid, options = {}) => ({
     contextInfo: {
-        mentionedJid: [userJid], // Tag user if needed
+        mentionedJid: [userJid],
         forwardingScore: 999,
         isForwarded: true,
         businessMessageForwardInfo: {
-            businessOwnerJid: NEWS_LETTER_JID, // Helps add verified feel
+            businessOwnerJid: NEWSLETTER_JID,
         },
         forwardedNewsletterMessageInfo: {
-            newsletterJid: NEWS_LETTER_JID,
+            newsletterJid: NEWSLETTER_JID,
             newsletterName: options.newsletterName || BOT_NAME,
             serverMessageId: Math.floor(100000 + Math.random() * 900000)
         },
         externalAdReply: {
             title: options.title || BOT_NAME,
-            body: options.body || "Premium WhatsApp Bot Solution",
-            thumbnailUrl: options.thumbnail || DEFAULT_THUMBNAIL,
+            body: options.body || 'Premium WhatsApp Bot Solution',
+            thumbnailUrl: options.thumbnail || getRandomImage(),
             mediaType: 1,
             mediaUrl: options.mediaUrl || undefined,
-            sourceUrl: options.sourceUrl || "https://wa.me/254728782591", // link to bot or business
+            sourceUrl: options.sourceUrl || 'https://wa.me/255753668403',
             showAdAttribution: true,
-            renderLargerThumbnail: false 
+            renderLargerThumbnail: options.large || false
         }
     }
 });
 
-module.exports = {
-    createContext
-};
+module.exports = { createContext };
