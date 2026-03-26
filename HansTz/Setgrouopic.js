@@ -278,7 +278,7 @@ adultComList.forEach((nomCom) => {
           forwardedNewsletterMessageInfo: {
             newsletterJid: '120363421513037430@newsletter',
             newsletterName: "VORTEX XMD",
-            serverMessageId: -1 * 1000),
+            serverMessageId: -1,
           },
           externalAdReply: {
             title: videoInfo.title,
