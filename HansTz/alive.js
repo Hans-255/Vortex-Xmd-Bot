@@ -5,7 +5,6 @@ const axios = require("axios");
 
 const { getRandomImage } = require("../Hans/images"); // audio from parent index
 
-const { getRandomImage } = require("../Hans/images");
 
 adams(
   { nomCom: "alive", reaction: "🪄", nomFichier: __filename },
